@@ -1,31 +1,25 @@
-import React, { useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { AppConfig, UserSession } from "@stacks/connect";
-import { ToastContainer } from "react-toastify";
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 
-import Home from "./components/home/Home";
-import Header from "./components/layout/header/Header";
+import Home from './components/home/Home';
+import Header from './components/layout/header/Header';
 
-import "./App.css";
-import Swap from "./components/swap/Swap";
-
-const appConfig = new AppConfig(["store_write", "publish_data"]);
-
-export const userSession = new UserSession({ appConfig });
+import './App.css';
+import Swap from './components/swap/Swap';
 
 function App() {
   // set theme as system setting
   useEffect(() => {
     if (
-      localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
+      localStorage.theme === 'dark' ||
+      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
     ) {
-      document.documentElement.classList.add("dark");
-      localStorage.theme = "dark";
+      document.documentElement.classList.add('dark');
+      localStorage.theme = 'dark';
     } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.theme = "light";
+      document.documentElement.classList.remove('dark');
+      localStorage.theme = 'light';
     }
   }, []);
 

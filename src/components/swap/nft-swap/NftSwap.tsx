@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import StxImg from "../../../assets/img/stx.png";
-import MiaImg from "../../../assets/img/mia.png";
-import { ReactComponent as InfoImg } from "../../../assets/img/info.svg";
-import { ReactComponent as SettingImg } from "../../../assets/img/setting.svg";
-import { ReactComponent as ChevronDownImg } from "../../../assets/img/chevron-down.svg";
-import { SwapProgress } from "../Swap";
-import TokenList from "../../common/TokenList";
+import ChevronDownImg from '/src/assets/img/chevron-down.svg?react';
+import InfoImg from '/src/assets/img/info.svg?react';
+import MiaImg from '/src/assets/img/mia.png';
+import SettingImg from '/src/assets/img/setting.svg?react';
+import TokenList from '../../common/TokenList';
+import { SwapProgress } from '../../../lib/swap';
 
 const NftSwap = ({
   setSwapProgress,
@@ -16,11 +15,9 @@ const NftSwap = ({
   const [fromTokenListVisible, setFromTokenListVisible] = useState(false);
   const [toTokenListVisible, setToTokenListVisible] = useState(false);
 
-  const onFromTokenSelectBtnClicked = () =>
-    setFromTokenListVisible(!fromTokenListVisible);
+  const onFromTokenSelectBtnClicked = () => setFromTokenListVisible(!fromTokenListVisible);
 
-  const onToTokenSelectBtnClicked = () =>
-    setFromTokenListVisible(!toTokenListVisible);
+  const onToTokenSelectBtnClicked = () => setFromTokenListVisible(!toTokenListVisible);
 
   return (
     <div className="w-full p-5 flex flex-col gap-3 bg-white dark:bg-[rgba(11,11,15,0.9)] rounded-[18px]">
@@ -33,9 +30,7 @@ const NftSwap = ({
       </div>
       <div className="p-5 flex justify-between items-center rounded-lg bg-[rgba(7,7,10,0.03)] dark:bg-[#14151A] border-[1px] border-[rgba(7,7,10,0.1)] dark:border-[rgba(255,255,255,0.1)]">
         <div className="w-full">
-          <p className="text-xs font-light leading-[14px] opacity-50">
-            You send
-          </p>
+          <p className="text-xs font-light leading-[14px] opacity-50">You send</p>
           <div className="mt-2 w-full flex justify-between items-center">
             <input
               className="text-[28px] leading-6 font-light outline-none bg-transparent w-1/2"
@@ -49,13 +44,9 @@ const NftSwap = ({
               <p className="text-xl font-medium leading-6">MIA</p>
               <ChevronDownImg className="dark:fill-white fill-special-black flex-none" />
             </button>
-            {fromTokenListVisible && (
-              <TokenList setTokenListVisible={setFromTokenListVisible} />
-            )}
+            {fromTokenListVisible && <TokenList setTokenListVisible={setFromTokenListVisible} />}
           </div>
-          <p className="mt-4 text-xs leading-[14px] font-light opacity-50">
-            ≈$275,208
-          </p>
+          <p className="mt-4 text-xs leading-[14px] font-light opacity-50">≈$275,208</p>
           <div className="mt-2.5 mb-1 rounded-lg w-full flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between p-4 pl-3 border-[1px] border-[rgba(7,7,10,0.1)] dark:border-[rgba(255,255,255,0.1)] bg-[rgba(7,7,10,0.04)] text-sm leading-[17px] font-normal">
             <div className="flex gap-1.5 items-center opacity-50">
               <p>Receiver BTCMonkey address</p>
@@ -67,9 +58,7 @@ const NftSwap = ({
       </div>
       <div className="p-5 flex justify-between items-center rounded-lg bg-[rgba(7,7,10,0.03)] dark:bg-[#14151A] border-[1px] border-[rgba(7,7,10,0.1)] dark:border-[rgba(255,255,255,0.1)]">
         <div className="w-full">
-          <p className="text-xs font-light leading-[14px] opacity-50">
-            You receive
-          </p>
+          <p className="text-xs font-light leading-[14px] opacity-50">You receive</p>
           <div className="w-full flex justify-between">
             <p className="mt-2 text-[28px] leading-6 font-light">0.000035</p>
             <button
@@ -80,9 +69,7 @@ const NftSwap = ({
               <p className="text-xl font-medium leading-6">MIA</p>
               <ChevronDownImg className="dark:fill-white fill-special-black flex-none" />
             </button>
-            {toTokenListVisible && (
-              <TokenList setTokenListVisible={setToTokenListVisible} />
-            )}
+            {toTokenListVisible && <TokenList setTokenListVisible={setToTokenListVisible} />}
           </div>
           <p className="mt-4 text-xs leading-[14px] font-light opacity-50">
             ≈$275,469

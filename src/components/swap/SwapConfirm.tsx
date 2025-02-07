@@ -1,17 +1,17 @@
-import React from "react";
+import React from 'react';
 
-import StxImg from "../../assets/img/stx.png";
-import BtcImg from "../../assets/img/btc.png";
-import { ReactComponent as DownImg } from "../../assets/img/down.svg";
-import { SwapProgress } from "./Swap";
-import { useAppSelector } from "../../app/hooks";
+import StxImg from '/src/assets/img/stx.png';
+import BtcImg from '/src/assets/img/btc.png';
+import DownImg from '/src/assets/img/down.svg?react';
+import { useAppSelector } from '../../app/hooks';
+import { SwapProgress } from '../../lib/swap';
 
 const SwapConfirm = ({
   setSwapProgress,
 }: {
   setSwapProgress: React.Dispatch<React.SetStateAction<SwapProgress>>;
 }) => {
-  const swapInfo = useAppSelector((state) => state.swap);
+  const swapInfo = useAppSelector(state => state.swap);
   const {
     amountInfo: { sendAmount, receiveAmount },
     addressInfo: { userBTCAddress, receiverSTXAddress },
@@ -56,8 +56,7 @@ const SwapConfirm = ({
         </div>
         <div className="h-[1px] bg-[rgba(255,255,255,0.1)]" />
         <p className="text-sm leading-5 font-extralight">
-          You will recive {receiveAmount} BTC. Transaction can be cancelled
-          after 100 blocks.
+          You will recive {receiveAmount} BTC. Transaction can be cancelled after 100 blocks.
         </p>
       </div>
       <div className="text-sm leading-[14px] flex flex-col gap-5 p-5 rounded-lg bg-[rgba(7,7,10,0.03)] dark:bg-[#14151A] border-[1px] border-[rgba(7,7,10,0.1)] dark:border-[rgba(255,255,255,0.1)]">

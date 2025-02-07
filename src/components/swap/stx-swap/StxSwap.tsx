@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import StxImg from "../../../assets/img/stx.png";
-import MiaImg from "../../../assets/img/mia.png";
-import { ReactComponent as InfoImg } from "../../../assets/img/info.svg";
-import { ReactComponent as SettingImg } from "../../../assets/img/setting.svg";
-import { ReactComponent as ChevronDownImg } from "../../../assets/img/chevron-down.svg";
-import { SwapProgress } from "../Swap";
-import TokenList from "../../common/TokenList";
+import StxImg from '/src/assets/img/stx.png';
+import MiaImg from '/src/assets/img/mia.png';
+import InfoImg from '/src/assets/img/info.svg?react';
+import SettingImg from '/src/assets/img/setting.svg?react';
+import ChevronDownImg from '/src/assets/img/chevron-down.svg?react';
+import TokenList from '../../common/TokenList';
+import { SwapProgress } from '../../../lib/swap';
 
 const StxSwap = ({
   setSwapProgress,
@@ -28,9 +28,7 @@ const StxSwap = ({
       </div>
       <div className="p-5 flex justify-between items-center rounded-lg bg-[rgba(7,7,10,0.03)] dark:bg-[#14151A] border-[1px] border-[rgba(7,7,10,0.1)] dark:border-[rgba(255,255,255,0.1)]">
         <div className="w-full">
-          <p className="text-xs font-light leading-[14px] opacity-50">
-            You send
-          </p>
+          <p className="text-xs font-light leading-[14px] opacity-50">You send</p>
           <div className="mt-2 w-full flex justify-between items-center">
             <input
               className="text-[28px] leading-6 font-light outline-none bg-transparent w-1/2"
@@ -42,20 +40,14 @@ const StxSwap = ({
             </div>
           </div>
           <div className="w-full flex justify-between">
-            <p className="mt-4 text-xs leading-[14px] font-light opacity-50">
-              ≈$275,208
-            </p>
-            <p className="mt-4 text-xs leading-[14px] font-light opacity-50">
-              Balance: 100 STX
-            </p>
+            <p className="mt-4 text-xs leading-[14px] font-light opacity-50">≈$275,208</p>
+            <p className="mt-4 text-xs leading-[14px] font-light opacity-50">Balance: 100 STX</p>
           </div>
         </div>
       </div>
       <div className="p-5 flex justify-between items-center rounded-lg bg-[rgba(7,7,10,0.03)] dark:bg-[#14151A] border-[1px] border-[rgba(7,7,10,0.1)] dark:border-[rgba(255,255,255,0.1)]">
         <div className="w-full">
-          <p className="text-xs font-light leading-[14px] opacity-50">
-            You receive
-          </p>
+          <p className="text-xs font-light leading-[14px] opacity-50">You receive</p>
           <div className="w-full flex justify-between">
             <p className="mt-2 text-[28px] leading-6 font-light">0.000035</p>
             <button
@@ -66,9 +58,7 @@ const StxSwap = ({
               <p className="text-xl font-medium leading-6">MIA</p>
               <ChevronDownImg className="dark:fill-white fill-special-black flex-none" />
             </button>
-            {tokenListVisible && (
-              <TokenList setTokenListVisible={setTokenListVisible} />
-            )}
+            {tokenListVisible && <TokenList setTokenListVisible={setTokenListVisible} />}
           </div>
           <p className="mt-4 text-xs leading-[14px] font-light opacity-50">
             ≈$275,469

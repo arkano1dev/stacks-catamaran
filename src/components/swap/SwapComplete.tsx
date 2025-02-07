@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
-import { ReactComponent as UpImg } from "../../assets/img/up.svg";
-import { Link } from "react-router-dom";
-import { SwapProgress } from "./Swap";
+import UpImg from '/src/assets/img/up.svg?react';
+import { Link } from 'react-router-dom';
+import { SwapProgress } from '../../lib/swap';
 
 const SwapComplete = ({
   setSwapProgress,
@@ -16,11 +16,9 @@ const SwapComplete = ({
   return (
     <div className="w-full p-5 flex flex-col gap-6 bg-white dark:bg-[rgba(11,11,15,0.9)] rounded-[18px] items-center">
       <div className="w-[240px] h-[240px] flex items-center justify-center">
-        <UpImg className="dark:stroke-white stroke-special-black w-20 h-20" />
+        <img src={UpImg} alt="up" className="dark:stroke-white stroke-special-black w-20 h-20" />
       </div>
-      <p className="w-full text-center text-[28px] leading-10">
-        Transation Submitted
-      </p>
+      <p className="w-full text-center text-[28px] leading-10">Transation Submitted</p>
       <div className="text-sm w-full leading-[14px] p-5 border-[1px] border-[rgba(7,7,10,0.1)] dark:border-[rgba(255,255,255,0.1)] rounded-lg flex flex-col sm:flex-row justify-between items-center">
         <p className="opacity-50">Transaction ID</p>
         <div className="flex gap-4 items-center flex-col sm:flex-row">

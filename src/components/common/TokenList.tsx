@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from "react";
-import TokenItem from "./TokenItem";
+import React, { useEffect, useRef } from 'react';
+import TokenItem from './TokenItem';
 
-import { ReactComponent as CloseImg } from "../../assets/img/close.svg";
-import StxImg from "../../assets/img/stx.png";
+import CloseImg from '/src/assets/img/close.svg?react';
+import StxImg from '/src/assets/img/stx.png';
 
 const TokenList = ({
   setTokenListVisible,
@@ -13,16 +13,13 @@ const TokenList = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(event.target as any)
-      ) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as any)) {
         setTokenListVisible(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [setTokenListVisible]);
 
   return (
@@ -44,31 +41,11 @@ const TokenList = ({
         />
         <div className="h-[1px] w-full bg-[rgba(255,255,255,0.1)]" />
         <div className="flex flex-col gap-6">
-          <TokenItem
-            name="STX"
-            imgSource={StxImg}
-            descrption="Stack’s native token"
-          />
-          <TokenItem
-            name="STX"
-            imgSource={StxImg}
-            descrption="Stack’s native token"
-          />
-          <TokenItem
-            name="STX"
-            imgSource={StxImg}
-            descrption="Stack’s native token"
-          />
-          <TokenItem
-            name="STX"
-            imgSource={StxImg}
-            descrption="Stack’s native token"
-          />
-          <TokenItem
-            name="STX"
-            imgSource={StxImg}
-            descrption="Stack’s native token"
-          />
+          <TokenItem name="STX" imgSource={StxImg} descrption="Stack’s native token" />
+          <TokenItem name="STX" imgSource={StxImg} descrption="Stack’s native token" />
+          <TokenItem name="STX" imgSource={StxImg} descrption="Stack’s native token" />
+          <TokenItem name="STX" imgSource={StxImg} descrption="Stack’s native token" />
+          <TokenItem name="STX" imgSource={StxImg} descrption="Stack’s native token" />
         </div>
       </div>
     </div>

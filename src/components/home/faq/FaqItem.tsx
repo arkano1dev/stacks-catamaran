@@ -1,7 +1,7 @@
 // imports
-import React, { useState } from "react";
-import { ReactComponent as ChevronUpImg } from "../../../assets/img/chevron-up.svg";
-import { ReactComponent as ChevronDownImg } from "../../../assets/img/chevron-down.svg";
+import React, { useState } from 'react';
+import ChevronUpImg from '/src/assets/img/chevron-up.svg?react';
+import ChevronDownImg from '/src/assets/img/chevron-down.svg?react';
 
 // prop types
 type FaqItemPropsType = {
@@ -36,7 +36,7 @@ const FaqItem = ({ title, children }: FaqItemPropsType) => {
       {children && (
         <div
           className={`flex items-center px-6 justify-between bg-transparent rounded-[18px] overflow-hidden transition-all ${
-            showAnswer ? "mt-4 py-4 h-24 opacity-1" : "h-0 opacity-0"
+            showAnswer ? 'mt-4 py-4 h-24 opacity-1' : 'h-0 opacity-0'
           }`}
         >
           <p>{children}</p>

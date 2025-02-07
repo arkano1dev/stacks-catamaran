@@ -1,28 +1,28 @@
-import React from "react";
-import Modal from "./Modal";
-import { showConnect } from "@stacks/connect";
-import { userSession } from "../../App";
+import React from 'react';
+import Modal from './Modal';
+import { showConnect } from '@stacks/connect';
+import { userSession } from '../../lib/userSession';
 
 const ConnectWallet = () => {
   const [showModal, setShowModal] = React.useState(false);
   const isAuthenticated = userSession.isUserSignedIn();
   const address = isAuthenticated
     ? (userSession.loadUserData().profile.stxAddress.mainnet as string)
-    : "";
+    : '';
 
   const logout = () => {
-    userSession.signUserOut("/");
+    userSession.signUserOut('/');
     window.location.reload();
   };
 
   const openModal = () => {
     setShowModal(true);
-    document.body.style.overflowY = "hidden";
+    document.body.style.overflowY = 'hidden';
   };
 
   const closeModal = () => {
     setShowModal(false);
-    document.body.style.overflowY = "auto";
+    document.body.style.overflowY = 'auto';
   };
 
   const authenticate = () => {
@@ -31,10 +31,10 @@ const ConnectWallet = () => {
     } else {
       showConnect({
         appDetails: {
-          name: "Stacks React Starter",
-          icon: window.location.origin + "/logo512.png",
+          name: 'Stacks React Starter',
+          icon: window.location.origin + '/logo512.png',
         },
-        redirectTo: "/",
+        redirectTo: '/',
         onFinish: () => {
           window.location.reload();
         },
@@ -52,15 +52,9 @@ const ConnectWallet = () => {
         type="button"
         onClick={authenticate}
       >
-        {isAuthenticated
-          ? `${address.slice(0, 5)}...${address.slice(-3)}`
-          : "Connect Wallet"}
+        {isAuthenticated ? `${address.slice(0, 5)}...${address.slice(-3)}` : 'Connect Wallet'}
       </button>
-      <Modal
-        showModal={showModal}
-        handleConfirm={logout}
-        handleClose={closeModal}
-      >
+      <Modal showModal={showModal} handleConfirm={logout} handleClose={closeModal}>
         <p className="mx-auto">Do you want to logout?</p>
       </Modal>
     </>

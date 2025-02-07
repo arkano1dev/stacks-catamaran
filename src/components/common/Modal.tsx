@@ -1,5 +1,5 @@
 // imports
-import React from "react";
+import React from 'react';
 
 // prop types
 type ModalPropsType = {
@@ -11,13 +11,7 @@ type ModalPropsType = {
 };
 
 // @component Modal
-const Modal = ({
-  title,
-  children,
-  showModal,
-  handleConfirm,
-  handleClose,
-}: ModalPropsType) => {
+const Modal = ({ title, children, showModal, handleConfirm, handleClose }: ModalPropsType) => {
   // return component
   return showModal ? (
     <>
@@ -50,9 +44,7 @@ const Modal = ({
             {/*body*/}
             {children && (
               <div className="relative p-6 flex-auto">
-                <p className="my-4 text-slate-500 text-lg leading-relaxed">
-                  {children}
-                </p>
+                <div className="my-4 text-slate-500 text-lg leading-relaxed">{children}</div>
               </div>
             )}
             {/*footer*/}

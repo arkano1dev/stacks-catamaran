@@ -1,27 +1,14 @@
-import React, { useState } from "react";
-import CatamaranSwap from "./catamaran-swap/CatamaranSwap";
-import SwapButton from "./SwapButton";
-import SwapConfirm from "./SwapConfirm";
-import SwapComplete from "./SwapComplete";
-import StxSwap from "./stx-swap/StxSwap";
-import NftSwap from "./nft-swap/NftSwap";
-
-export const enum SwapItems {
-  CANTAMARAN_SWAP = "Catamaran Swap",
-  STX_SWAP = "STX Swap",
-  NFT_SWAP = "NFT Swap",
-}
-
-export const enum SwapProgress {
-  PREVEIW_SWAP = "Preview Swap",
-  SWAP_CONFIRM = "Swap confirm",
-  SWAP_COMPLETED = "Swap completed",
-}
+import React, { useState } from 'react';
+import CatamaranSwap from './catamaran-swap/CatamaranSwap';
+import SwapButton from './SwapButton';
+import SwapConfirm from './SwapConfirm';
+import SwapComplete from './SwapComplete';
+import StxSwap from './stx-swap/StxSwap';
+import NftSwap from './nft-swap/NftSwap';
+import { SwapItems, SwapProgress } from '../../lib/swap';
 
 const Swap = () => {
-  const [swapProgress, setSwapProgress] = useState<SwapProgress>(
-    SwapProgress.PREVEIW_SWAP
-  );
+  const [swapProgress, setSwapProgress] = useState<SwapProgress>(SwapProgress.PREVEIW_SWAP);
   const [selectedHeaderItem, setSelectedHeaderItem] = useState<SwapItems>(
     SwapItems.CANTAMARAN_SWAP
   );
@@ -35,16 +22,6 @@ const Swap = () => {
               <div className="w-full flex rounded-[18px] bg-white dark:bg-[rgba(11,11,15,0.9)] p-2 gap-2.5 text-center">
                 <SwapButton
                   name={SwapItems.CANTAMARAN_SWAP}
-                  setSelectedHeaderItem={setSelectedHeaderItem}
-                  selectedHeaderItem={selectedHeaderItem}
-                />
-                <SwapButton
-                  name={SwapItems.STX_SWAP}
-                  setSelectedHeaderItem={setSelectedHeaderItem}
-                  selectedHeaderItem={selectedHeaderItem}
-                />
-                <SwapButton
-                  name={SwapItems.NFT_SWAP}
                   setSelectedHeaderItem={setSelectedHeaderItem}
                   selectedHeaderItem={selectedHeaderItem}
                 />
