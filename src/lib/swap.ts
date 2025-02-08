@@ -1,7 +1,8 @@
 export const enum SwapItems {
-  CANTAMARAN_SWAP = 'Catamaran Swap',
-  STX_SWAP = 'STX Swap',
-  NFT_SWAP = 'NFT Swap',
+  CATAMARAN_SWAP = 'Catamaran Swap',
+  HISTORY = 'History',
+  // STX_SWAP = 'STX Swap',
+  // NFT_SWAP = 'NFT Swap',
 }
 
 export const enum SwapProgress {

@@ -6,13 +6,13 @@ const Faq = () => {
       <h1 className="text-[28px] leading-[33px] font-medium text-center">FAQ</h1>
       <div className="mt-10 w-full flex flex-col gap-3">
         <FaqItem title="What can go wrong with catamaran swaps (BTC - sBTC)?">
-          Even with fast bitcoin blocks (flash blocks), the catamaran swaps can be verified on the
+          Even with fast bitcoin blocks (flash blocks), Catamaran swaps can be verified on the
           Stacks blockchain. However, bitcoin transactions with more than 8 inputs or 8 outputs
           can't be verified.
         </FaqItem>
         <FaqItem title="Where can I find more details about the used smart contracts?">
           The smart contracts are open source and contains several tests. You find the git repo at{' '}
-          <a href="https://github.com/friedger/clarity-catamaranswaps" className="text-blue-500">
+          <a href="https://github.com/friedger/clarity-catamaranswaps/blob/feat/sbtc/catamaran-sbtc" className="text-blue-500">
             github.com/friedger/clarity-catamaranswaps
           </a>
           .

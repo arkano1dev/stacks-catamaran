@@ -1,6 +1,6 @@
 import React from "react";
+import { SwapItems } from "../../lib/swap";
 
-import { SwapItems } from "./Swap";
 
 const SwapButton = ({
   name,
@@ -15,9 +15,8 @@ const SwapButton = ({
 
   return (
     <button
-      className={`flex-1 flex items-center justify-center py-2 ${
-        selected ? "bg-[rgba(7,7,10,0.07)] dark:bg-[#14151A]" : ""
-      }  rounded-2xl text-base font-normal`}
+      className={`flex-1 flex items-center justify-center py-2 ${selected ? "bg-[rgba(7,7,10,0.07)] dark:bg-[#14151A]" : ""
+        }  rounded-2xl text-base font-normal`}
       onClick={() => setSelectedHeaderItem(name)}
     >
       {name}

@@ -1,21 +1,19 @@
 /** @type {import('tailwindcss').Config} */
-const defaultTheme = require("tailwindcss/defaultTheme");
+import { fontFamily as _fontFamily } from 'tailwindcss/defaultTheme';
 
-module.exports = {
-  darkMode: "class",
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
-  theme: {
-    extend: {
-      colors: {
-        "special-black": "#07070A",
-      },
-      backgroundImage: {
-        "dark-image": "url('./assets/img/background.png')",
-      },
-      fontFamily: {
-        sans: ["SF Mono", ...defaultTheme.fontFamily.sans],
-      },
+export const darkMode = 'class';
+export const content = ['./src/**/*.{js,jsx,ts,tsx}'];
+export const theme = {
+  extend: {
+    colors: {
+      'special-black': '#07070A',
+    },
+    backgroundImage: {
+      'dark-image': "url('./assets/img/background.png')",
+    },
+    fontFamily: {
+      sans: ['SF Mono', ..._fontFamily.sans],
     },
   },
-  plugins: [],
 };
+export const plugins = [];

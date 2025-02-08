@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { setSwapAddressDetail, setSwapAmountDetail } from "./thunks";
+import { createSlice } from '@reduxjs/toolkit';
+import { setSwapAddressDetail, setSwapAmountDetail, setSwapTransactions } from './thunks';
 
 export interface SwapAmountDetail {
   sendAmount: number;
@@ -11,9 +11,17 @@ export interface SwapAddressDetail {
   receiverSTXAddress: string;
 }
 
+export interface SwapTransactions {
+  createTx?: string;
+  btcTransferTx?: string;
+  submitTx?: string;
+  cancelTx?: string;
+}
+
 export interface SwapDetail {
   amountInfo: SwapAmountDetail;
   addressInfo: SwapAddressDetail;
+  swapTxs: SwapTransactions;
 }
 
 const initialState: SwapDetail = {
@@ -22,16 +30,17 @@ const initialState: SwapDetail = {
     receiveAmount: 0,
   },
   addressInfo: {
-    userBTCAddress: "",
-    receiverSTXAddress: "",
+    userBTCAddress: '',
+    receiverSTXAddress: '',
   },
+  swapTxs: {},
 };
 
 export const swapSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       .addCase(setSwapAmountDetail.fulfilled, (state, action) => {
         return {
@@ -43,6 +52,15 @@ export const swapSlice = createSlice({
         };
       })
       .addCase(setSwapAddressDetail.fulfilled, (state, action) => {
+        return {
+          ...state,
+          addressInfo: {
+            ...state.addressInfo,
+            ...action.payload,
+          },
+        };
+      })
+      .addCase(setSwapTransactions.fulfilled, (state, action) => {
         return {
           ...state,
           addressInfo: {

@@ -1,17 +1,47 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CatamaranSwap from './catamaran-swap/CatamaranSwap';
 import SwapButton from './SwapButton';
 import SwapConfirm from './SwapConfirm';
 import SwapComplete from './SwapComplete';
-import StxSwap from './stx-swap/StxSwap';
-import NftSwap from './nft-swap/NftSwap';
+
 import { SwapItems, SwapProgress } from '../../lib/swap';
+import { connectWebSocketClient, createClient, StacksApiWebSocketClient } from '@stacks/blockchain-api-client';
+
+import { userSession } from '../../lib/userSession';
+import ConnectFirst from './catamaran-swap/ConnectFirst';
+import { useParams } from 'react-router-dom';
+import History from './History';
 
 const Swap = () => {
+  const { id } = useParams<{ id: string }>();
+
   const [swapProgress, setSwapProgress] = useState<SwapProgress>(SwapProgress.PREVEIW_SWAP);
   const [selectedHeaderItem, setSelectedHeaderItem] = useState<SwapItems>(
-    SwapItems.CANTAMARAN_SWAP
+    id ? SwapItems.HISTORY : SwapItems.CATAMARAN_SWAP
   );
+  const params = new URLSearchParams(window.location.search);
+  const apiUrl = params.get('api');
+  const chain = params.get('chain');
+  const isTestnet = chain === 'testnet';
+
+  const baseUrl = apiUrl ? apiUrl : isTestnet ? "https://api.testnet.hiro.so" : 'https://api.hiro.so';
+  const wsUrl = isTestnet ? "wss://api.testnet.hiro.so" : 'wss://api.hiro.so';
+  const client = createClient({
+    baseUrl,
+  })
+  const [wsClient, setWsClient] = useState<StacksApiWebSocketClient | null>(null);
+
+  useEffect(() => {
+    const fn = async () => {
+      const wsc = await connectWebSocketClient(wsUrl);
+      setWsClient(wsc);
+    }
+    fn();
+  }, [wsUrl]);
+
+  const sbtcAsset = isTestnet ? "SN1Z0WW5SMN4J99A1G1725PAB8H24CWNA7Z8H7214.sbtc-token::sbtc-token" : "SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token::sbtc-token"
+  const sbtcSwapContract = isTestnet ? "" : "";
+  const isAuthenticated = userSession.isUserSignedIn();
 
   return (
     <div className="w-full flex justify-center">
@@ -21,19 +51,24 @@ const Swap = () => {
             <>
               <div className="w-full flex rounded-[18px] bg-white dark:bg-[rgba(11,11,15,0.9)] p-2 gap-2.5 text-center">
                 <SwapButton
-                  name={SwapItems.CANTAMARAN_SWAP}
+                  name={SwapItems.CATAMARAN_SWAP}
+                  setSelectedHeaderItem={setSelectedHeaderItem}
+                  selectedHeaderItem={selectedHeaderItem}
+                />
+                <SwapButton
+                  name={SwapItems.HISTORY}
                   setSelectedHeaderItem={setSelectedHeaderItem}
                   selectedHeaderItem={selectedHeaderItem}
                 />
               </div>
               {(() => {
                 switch (selectedHeaderItem) {
-                  case SwapItems.CANTAMARAN_SWAP:
-                    return <CatamaranSwap setSwapProgress={setSwapProgress} />;
-                  case SwapItems.STX_SWAP:
-                    return <StxSwap setSwapProgress={setSwapProgress} />;
-                  case SwapItems.NFT_SWAP:
-                    return <NftSwap setSwapProgress={setSwapProgress} />;
+                  case SwapItems.CATAMARAN_SWAP:
+                    return isAuthenticated ?
+                      <CatamaranSwap setSwapProgress={setSwapProgress} sbtcAsset={sbtcAsset} client={client} /> :
+                      <ConnectFirst />
+                  case SwapItems.HISTORY:
+                    return isAuthenticated ? <History id={id} /> : <ConnectFirst />;
                 }
               })()}
             </>
@@ -42,9 +77,9 @@ const Swap = () => {
               {(() => {
                 switch (swapProgress) {
                   case SwapProgress.SWAP_CONFIRM:
-                    return <SwapConfirm setSwapProgress={setSwapProgress} />;
+                    return <SwapConfirm setSwapProgress={setSwapProgress} sbtcSwapContract={sbtcSwapContract} />;
                   case SwapProgress.SWAP_COMPLETED:
-                    return <SwapComplete setSwapProgress={setSwapProgress} />;
+                    return <SwapComplete setSwapProgress={setSwapProgress} wsClient={wsClient} />;
                 }
               })()}
             </>

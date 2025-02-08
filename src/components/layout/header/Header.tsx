@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import ConnectWallet from '../../common/ConnectWallet';
@@ -6,7 +6,6 @@ import ThemeSelector from '../../common/ThemeSelector';
 import Navbar from './Navbar';
 
 import LogoImg from '/src/assets/img/logo.svg?react';
-import ChevronDownImg from '/src/assets/img/chevron-down.svg?react';
 import NavbarImg from '/src/assets/img/navbar.svg?react';
 
 const Header = () => {

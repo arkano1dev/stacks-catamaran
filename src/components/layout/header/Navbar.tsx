@@ -5,7 +5,6 @@ import ConnectWallet from '../../common/ConnectWallet';
 import ThemeSelector from '../../common/ThemeSelector';
 
 import CloseImg from '/src/assets/img/close.svg?react';
-import ChevronDownImg from '/src/assets/img/chevron-down.svg?react';
 
 const Navbar = ({
   navbarVisible,
@@ -18,9 +17,8 @@ const Navbar = ({
 
   return (
     <div
-      className={`sm:hidden overflow-hidden fixed z-10 top-0 right-0 ${
-        navbarVisible === true ? 'w-full' : 'w-0'
-      }  h-[100vh] bg-white dark:bg-black transition-[width] duration-500`}
+      className={`sm:hidden overflow-hidden fixed z-10 top-0 right-0 ${navbarVisible === true ? 'w-full' : 'w-0'
+        }  h-[100vh] bg-white dark:bg-black transition-[width] duration-500`}
     >
       <div className="w-full h-20 px-5 flex justify-end items-center">
         <button onClick={closeNavbar}>

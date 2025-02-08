@@ -11,7 +11,7 @@ const ConnectWallet = () => {
     : '';
 
   const logout = () => {
-    userSession.signUserOut('/');
+    userSession.signUserOut(window.location.origin);
     window.location.reload();
   };
 
