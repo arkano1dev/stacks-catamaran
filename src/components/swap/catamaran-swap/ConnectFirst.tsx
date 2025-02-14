@@ -3,7 +3,7 @@ import ConnectWallet from '../../common/ConnectWallet';
 import InfoImg from '/src/assets/img/info.svg?react';
 
 
-const ConnectFirst = () => {
+const ConnectFirst = ({ chain }: { chain: string }) => {
 
   return (
     <div className="w-full p-5 flex flex-col gap-3 bg-white dark:bg-[rgba(11,11,15,0.9)] rounded-[18px]">
@@ -29,7 +29,7 @@ const ConnectFirst = () => {
           </div>
         </div>
       </div>
-      <ConnectWallet />
+      <ConnectWallet chain={chain} />
     </div>
   );
 };

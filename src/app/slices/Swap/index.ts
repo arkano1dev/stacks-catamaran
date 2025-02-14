@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { setSwapAddressDetail, setSwapAmountDetail, setSwapTransactions } from './thunks';
+import { Address } from '@stacks/transactions';
 
 export interface SwapAmountDetail {
   sendAmount: number;

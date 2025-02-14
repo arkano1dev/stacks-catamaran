@@ -1,36 +1,26 @@
-import {
-  configureStore,
-  ThunkAction,
-  Action,
-  combineReducers,
-} from "@reduxjs/toolkit";
-import { setupListeners } from "@reduxjs/toolkit/query";
-import storage from "redux-persist/lib/storage";
-import {
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from "redux-persist";
-import swapReducer from "./slices/Swap";
+import { configureStore, ThunkAction, Action, combineReducers } from '@reduxjs/toolkit';
+import { setupListeners } from '@reduxjs/toolkit/query';
+import storage from 'redux-persist/lib/storage';
+import { persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
+import swapReducer from './slices/Swap';
+import userReducer from './slices/User';
+import { userConnected } from './slices/User/thunks';
 
 const persistConfig = {
-  key: "root",
+  key: 'root',
   storage: storage,
-  blacklist: ["apiProductSlice"],
+  blacklist: ['apiProductSlice'],
 };
 export const rootReducers = combineReducers({
   swap: swapReducer,
+  user: userReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducers);
 
 const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) =>
+  middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],

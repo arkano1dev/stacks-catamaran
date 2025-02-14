@@ -1,18 +1,24 @@
+import { request, showConnect } from '@stacks/connect';
+import { AddressEntry } from '@stacks/connect/dist/types/methods';
 import React from 'react';
+import { useDispatch } from 'react-redux';
+import { userConnected, userDisconnected } from '../../app/slices/User/thunks';
+import { AppDispatch } from '../../app/store';
 import Modal from './Modal';
-import { showConnect } from '@stacks/connect';
+import { useAppSelector } from '../../app/hooks';
 import { userSession } from '../../lib/userSession';
 
-const ConnectWallet = () => {
+const ConnectWallet = ({ chain }: { chain: string }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useAppSelector(state => state.user);
   const [showModal, setShowModal] = React.useState(false);
-  const isAuthenticated = userSession.isUserSignedIn();
-  const address = isAuthenticated
-    ? (userSession.loadUserData().profile.stxAddress.mainnet as string)
-    : '';
+  const [stxAddress, setStxAddress] = React.useState<string | undefined>(user.wallet?.stxAddress);
+  const isAuthenticated = stxAddress !== undefined;
 
   const logout = () => {
-    userSession.signUserOut(window.location.origin);
-    window.location.reload();
+    setStxAddress(undefined);
+    setShowModal(false);
+    dispatch(userDisconnected());
   };
 
   const openModal = () => {
@@ -25,10 +31,22 @@ const ConnectWallet = () => {
     document.body.style.overflowY = 'auto';
   };
 
-  const authenticate = () => {
+  const authenticate = async () => {
     if (isAuthenticated) {
       openModal();
     } else {
+      const result = await request("getAddresses", {
+        network: chain === "testnet" ? "testnet" : "mainnet",
+      })
+      console.log({ result })
+      const stxEntry = result.addresses.find((entry) => entry.symbol === "STX");
+      console.log({ stxEntry })
+      if (stxEntry) {
+        console.log({ result });
+        setStxAddress(stxEntry.address);
+        dispatch(userConnected({ addresses: result.addresses, stxAddress: stxEntry.address }));
+      }
+
       showConnect({
         appDetails: {
           name: 'Stacks React Starter',
@@ -38,10 +56,12 @@ const ConnectWallet = () => {
         onFinish: () => {
           window.location.reload();
         },
-        userSession,
-      });
+        userSession: userSession,
+      })
     }
   };
+
+  console.log({ stxAddress }, isAuthenticated);
 
   return (
     <>
@@ -52,7 +72,7 @@ const ConnectWallet = () => {
         type="button"
         onClick={authenticate}
       >
-        {isAuthenticated ? `${address.slice(0, 5)}...${address.slice(-3)}` : 'Connect Wallet'}
+        {stxAddress ? `${stxAddress.slice(0, 5)}...${stxAddress.slice(-3)}` : 'Connect Wallet'}
       </button>
       <Modal showModal={showModal} handleConfirm={logout} handleClose={closeModal}>
         <p className="mx-auto">Do you want to logout?</p>

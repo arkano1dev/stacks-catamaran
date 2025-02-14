@@ -1,27 +1,28 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { userConnected } from "./thunks";
+import { createSlice } from '@reduxjs/toolkit';
+import { userConnected } from './thunks';
+import { GetAddressesResult } from '@stacks/connect/dist/types/methods';
 
 export interface UserState {
   isAuthenticated: boolean;
-  wallet: {
-    address: string;
+  wallet?: {
+    addresses: GetAddressesResult['addresses'];
+    stxAddress?: string;
   };
 }
 
 const initialState: UserState = {
   isAuthenticated: false,
-  wallet: {
-    address: "",
-  },
 };
 
 export const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder.addCase(userConnected.fulfilled, (state, action) => {
       return { ...state, ...action.payload };
     });
   },
 });
+
+export default userSlice.reducer;

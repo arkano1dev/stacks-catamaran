@@ -9,9 +9,11 @@ import CloseImg from '/src/assets/img/close.svg?react';
 const Navbar = ({
   navbarVisible,
   setNavbarVisible,
+  chain
 }: {
   navbarVisible: boolean;
   setNavbarVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  chain: string;
 }) => {
   const closeNavbar = () => setNavbarVisible(false);
 
@@ -34,7 +36,7 @@ const Navbar = ({
         </Link>
         <div className="w-full justify-center items-center flex gap-3">
           <ThemeSelector />
-          <ConnectWallet />
+          <ConnectWallet chain={chain} />
         </div>
       </div>
     </div>

@@ -8,12 +8,12 @@ import Navbar from './Navbar';
 import LogoImg from '/src/assets/img/logo.svg?react';
 import NavbarImg from '/src/assets/img/navbar.svg?react';
 
-const Header = () => {
+const Header = ({ chain }: { chain: string }) => {
   const [navbarVisible, setNavbarVisible] = useState(false);
 
   return (
     <div className="w-full overflow-x-hidden relative">
-      <Navbar navbarVisible={navbarVisible} setNavbarVisible={setNavbarVisible} />
+      <Navbar navbarVisible={navbarVisible} setNavbarVisible={setNavbarVisible} chain={chain} />
       <div className="w-full h-20 flex justify-center">
         <div className="max-w-[1440px] w-full px-5 sm:px-20 flex justify-between items-center">
           <div className="flex-1 flex items-center">
@@ -35,7 +35,7 @@ const Header = () => {
           </div>
           <div className="flex-1 justify-end items-center hidden sm:flex gap-3">
             <ThemeSelector />
-            <ConnectWallet />
+            <ConnectWallet chain={chain} />
           </div>
           <button className="sm:hidden" onClick={() => setNavbarVisible(true)}>
             <NavbarImg className="w-6 h-6 dark:fill-white fill-special-black" />

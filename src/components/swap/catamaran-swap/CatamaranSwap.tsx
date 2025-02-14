@@ -7,7 +7,6 @@ import { useAppSelector } from '../../../app/hooks';
 import { setSwapAddressDetail, setSwapAmountDetail } from '../../../app/slices/Swap/thunks';
 import { AppDispatch } from '../../../app/store';
 import { SwapProgress } from '../../../lib/swap';
-import { userSession } from '../../../lib/userSession';
 import BtcImg from '/src/assets/img/btc.png';
 import ChevronDownImg from '/src/assets/img/chevron-down.svg?react';
 import InfoImg from '/src/assets/img/info.svg?react';
@@ -34,10 +33,12 @@ const CatamaranSwap = ({
   client,
   sbtcAsset,
   setSwapProgress,
+  chain
 }: {
   client: ReturnType<typeof createClient>;
   sbtcAsset: string;
   setSwapProgress: React.Dispatch<React.SetStateAction<SwapProgress>>;
+  chain: string;
 }) => {
 
   const [amounts, setAmounts] = useState({
@@ -59,14 +60,12 @@ const CatamaranSwap = ({
   const { sendAmount, receiveAmount } = amounts;
   const dispatch = useDispatch<AppDispatch>();
   const swapInfo = useAppSelector(state => state.swap);
-  const isAuthenticated = userSession.isUserSignedIn();
+  const user = useAppSelector(state => state.user);;
 
-  const userWalletData = isAuthenticated ? userSession.loadUserData() : undefined;
-  const userSTXAddress = userWalletData ? userWalletData.profile.stxAddress.mainnet : '';
-  const userBTCAddress = userWalletData
-    ? (userWalletData.profile.btcAddress.p2wpkh.mainnet as string)
-    : '';
+  const userBTCAddress = user.isAuthenticated ? user.wallet?.addresses.find((entry) =>
+    entry.symbol === "BTC" && (entry as any).type === "p2wpkh")?.address || '' : '';
 
+  console.log(userBTCAddress)
   useEffect(() => {
     if (userBTCAddress) {
       setBtcAddress(userBTCAddress);
@@ -74,7 +73,9 @@ const CatamaranSwap = ({
   }, [userBTCAddress]);
 
   useEffect(() => {
-    if (userSTXAddress) {
+    console.log(user.isAuthenticated, user.wallet?.stxAddress)
+    if (user.isAuthenticated && user.wallet?.stxAddress) {
+      const userSTXAddress = user.wallet.stxAddress;
       void (async () => {
         const { data: balanceInfo } = await client.GET("/extended/v1/address/{principal}/balances", {
           params: {
@@ -91,7 +92,7 @@ const CatamaranSwap = ({
         }
       })();
     }
-  }, [userSTXAddress]);
+  }, [user.isAuthenticated, user.wallet?.stxAddress]);
 
   const { balanceSBTC } = accountBalance ?? {};
 
@@ -126,14 +127,15 @@ const CatamaranSwap = ({
   }, [receiveAmount]);
 
   useEffect(() => {
-    if (swapInfo && isAuthenticated) {
+    console.log({ swapInfo }, userBTCAddress)
+    if (swapInfo && user.isAuthenticated) {
       setAmounts(swapInfo.amountInfo);
-      setBtcAddress(swapInfo.addressInfo.userBTCAddress);
+      setBtcAddress(swapInfo.addressInfo.userBTCAddress || userBTCAddress);
       setStxAddress(swapInfo.addressInfo.receiverSTXAddress);
     }
-  }, [swapInfo, isAuthenticated]);
+  }, [swapInfo, user.isAuthenticated, userBTCAddress]);
 
-  if (!isAuthenticated) {
+  if (!user.isAuthenticated) {
     return null;
   }
 

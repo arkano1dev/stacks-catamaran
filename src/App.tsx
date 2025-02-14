@@ -1,13 +1,12 @@
-import React, { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import './App.css';
 import Header from './components/layout/header/Header';
 import SBtcImg from '/src/assets/img/sbtc.png';
 
 const Home = lazy(() => import('./components/home/Home'));
 const Swap = lazy(() => import('./components/swap/Swap'));
-
-import './App.css';
 
 const Loading = () => {
   return (
@@ -17,6 +16,10 @@ const Loading = () => {
   )
 }
 function App() {
+
+  const params = new URLSearchParams(window.location.search);
+  const chain = params.get('chain');
+
   // set theme as system setting
   useEffect(() => {
     if (
@@ -34,7 +37,7 @@ function App() {
   return (
     <Router>
       <div className="App backdrop-blur-[96px] min-h-[100vh] text-special-black dark:text-white transition-all duration-500 overflow-hidden relative flex flex-col">
-        <Header />
+        <Header chain={chain || ""} />
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Home />} />
