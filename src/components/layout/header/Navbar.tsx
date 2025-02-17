@@ -31,7 +31,9 @@ const Navbar = ({
         <Link to="/swaps" className="text-base font-normal leading-6" onClick={closeNavbar}>
           Swaps
         </Link>
-        <Link to="/documentation" className="text-base font-normal leading-6" onClick={closeNavbar}>
+        <Link target="_blank"
+          to="https://docs.catamaranswaps.org/"
+          className="text-base font-normal leading-6" onClick={closeNavbar}>
           Documentation
         </Link>
         <div className="w-full justify-center items-center flex gap-3">

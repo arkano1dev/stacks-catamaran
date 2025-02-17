@@ -1,5 +1,5 @@
 
-import ConnectWallet from '../../common/ConnectWallet';
+import ConnectWallet from '../common/ConnectWallet';
 import InfoImg from '/src/assets/img/info.svg?react';
 
 
