@@ -1,33 +1,40 @@
 import React, { useEffect, useState } from 'react';
 
-import { MempoolTransaction, StacksApiWebSocketClient, Transaction } from '@stacks/blockchain-api-client';
-import { hexToCV, ResponseOkCV, UIntCV } from '@stacks/transactions';
-import { Link } from 'react-router-dom';
-import { useAppSelector } from '../../../app/hooks';
+import { Client, MempoolTransaction, StacksApiWebSocketClient, Transaction } from '@stacks/blockchain-api-client';
+import { cvToString, hexToCV } from '@stacks/transactions';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { SwapProgress } from '../../../lib/swap';
 
-import { createBtcExplorerLink, createExplorerLink } from '../../../lib/browser';
-import BtcSwapItem from './BtcSwapItem';
+import { paths } from '@stacks/blockchain-api-client/lib/generated/schema';
 import { request } from '@stacks/connect';
+import { setSwapTransactions } from '../../../app/slices/Swap/thunks';
+import { createSubmitStxTransactionArgs } from '../../../lib/bitcoin-tx-proof/createArgs';
+import { createBtcExplorerLink } from '../../../lib/browser';
+import { concatWtx, wasSegwitTxMinedCompact } from '../../../lib/stacks-api/rpc';
+import BtcSwapItem from './BtcSwapItem';
 
 const BtcSwapClaim = ({
   setSwapProgress,
   sbtcSwapContract,
   chain,
+  client
 }: {
   setSwapProgress: React.Dispatch<React.SetStateAction<SwapProgress>>;
-  sbtcSwapContract: string;
+  sbtcSwapContract: `${string}.${string}`;
   chain: string;
+  client: Client<paths, `${string}/${string}`>;
 }) => {
   const swapInfo = useAppSelector(state => state.swap);
+  const dispatch = useAppDispatch();
+
   const {
     amountInfo: { sendAmount, receiveAmount },
     addressInfo: { userBTCAddress, receiverSTXAddress },
     swapTxs,
   } = swapInfo;
-  const btcTxid = swapTxs?.btcTransferTx || "0x1234";
+  const btcTxid = swapTxs?.btcTransferTx || "64ff37f00fa30a1234a89dd88b549c5180029b8e7aa49b703bde2b469f9703fb";
 
-  const swapId = 2 //swapTxs?.swapId;
+  const swapId = 0 //swapTxs?.swapId;
 
   const [txError, setTxError] = useState<{ status: (Transaction | MempoolTransaction)["tx_status"] } | undefined>();
   const [txPending, setTxPending] = React.useState(true);
@@ -44,13 +51,48 @@ const BtcSwapClaim = ({
   }, []);
 
 
-  const onClaimBtnClicked = () => {
-    // request("stx_callContract", {
-    //   contractAddress: sbtcSwapContract,
+  const onClaimBtnClicked = async () => {
 
-    // });
+    const { claimArgs, verifyArgs } = await createSubmitStxTransactionArgs(swapId, btcTxid, chain);
+    const functionName = "submit-swap-segwit";
 
-    setSwapProgress(SwapProgress.SUBMIT_ON_STX_COMPLETED);
+    // SimulationBuilder.new()
+    //   .withSender(receiverSTXAddress)
+    //   .addContractCall({
+    //     contract_id: sbtcSwapContract,
+    //     function_name: 'set-enabled',
+    //     function_args: functionArgs,
+    //   })
+    //   .run()
+    //   .catch(console.error);
+
+    const resultMind = await wasSegwitTxMinedCompact(verifyArgs, receiverSTXAddress);
+
+    console.log(cvToString(hexToCV(resultMind.result)));
+
+    const resultConcat = await concatWtx(claimArgs, receiverSTXAddress);
+
+    console.log(cvToString(hexToCV(resultConcat.result)));
+
+    const response = await request("stx_callContract", {
+      contract: sbtcSwapContract,
+      functionName,
+      functionArgs: claimArgs,
+      postConditionMode: "allow",
+      network: chain === "testnet" ? "testnet" : "mainnet",
+
+    });
+    console.log(response);
+    const submitTx = response.txid;
+    if (submitTx) {
+      dispatch(setSwapTransactions({
+        ...swapTxs,
+        submitTx
+      }
+      ));
+    }
+
+    // setSwapProgress(SwapProgress.SUBMIT_ON_STX_COMPLETED);
   };
 
   const title = txPending ? "Bitcoin Transaction Pending" :
@@ -89,15 +131,10 @@ const BtcSwapClaim = ({
         >
           Claim sBTC
         </button>
-        <Link
-          to="/"
-          className="text-center w-full rounded-full py-3 text-base font-medium leading-5"
-        >
-          Close
-        </Link>
       </div>
     </div>
   );
 };
 
 export default BtcSwapClaim;
+

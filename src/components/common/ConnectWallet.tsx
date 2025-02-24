@@ -1,15 +1,11 @@
-import { request, showConnect } from '@stacks/connect';
-import { AddressEntry } from '@stacks/connect/dist/types/methods';
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { userConnected, userDisconnected } from '../../app/slices/User/thunks';
-import { AppDispatch } from '../../app/store';
+import { getAddresses } from '../../lib/wallet-requests/getAddresses';
 import Modal from './Modal';
-import { useAppSelector } from '../../app/hooks';
-import { userSession } from '../../lib/userSession';
 
 const ConnectWallet = ({ chain }: { chain: string }) => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.user);
   const [showModal, setShowModal] = React.useState(false);
   const [stxAddress, setStxAddress] = React.useState<string | undefined>(user.wallet?.stxAddress);
@@ -35,29 +31,14 @@ const ConnectWallet = ({ chain }: { chain: string }) => {
     if (isAuthenticated) {
       openModal();
     } else {
-      const result = await request("getAddresses", {
-        network: chain === "testnet" ? "testnet" : "mainnet",
-      })
-      console.log({ result })
-      const stxEntry = result.addresses.find((entry) => entry.symbol === "STX");
-      console.log({ stxEntry })
+      const result = await getAddresses(chain);
+      const stxEntry = result.addresses.find(entry => entry.symbol === 'STX');
+      console.log({ stxEntry });
       if (stxEntry) {
         console.log({ result });
         setStxAddress(stxEntry.address);
         dispatch(userConnected({ addresses: result.addresses, stxAddress: stxEntry.address }));
       }
-
-      showConnect({
-        appDetails: {
-          name: 'Stacks React Starter',
-          icon: window.location.origin + '/logo512.png',
-        },
-        redirectTo: '/',
-        onFinish: () => {
-          window.location.reload();
-        },
-        userSession: userSession,
-      })
     }
   };
 

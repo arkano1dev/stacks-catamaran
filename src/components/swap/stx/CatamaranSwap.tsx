@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
 
 import { createClient } from '@stacks/blockchain-api-client';
-import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { useAppSelector } from '../../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { setSwapAddressDetail, setSwapAmountDetail } from '../../../app/slices/Swap/thunks';
-import { AppDispatch } from '../../../app/store';
 import { SwapProgress } from '../../../lib/swap';
+import BtcSBtcSwapTitle from '../BtcSBtcSwapTitle';
 import BtcImg from '/src/assets/img/btc.png';
 import ChevronDownImg from '/src/assets/img/chevron-down.svg?react';
 import InfoImg from '/src/assets/img/info.svg?react';
 import SBtcImg from '/src/assets/img/sbtc.png';
-import BtcSBtcSwapTitle from '../BtcSBtcSwapTitle';
 
 interface AccountBalance {
   balanceSTX: number;
@@ -59,7 +57,7 @@ const CatamaranSwap = ({
     btc: 97755.23, // TODO fetch price
   });
   const { sendAmount, receiveAmount } = amounts;
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const swapInfo = useAppSelector(state => state.swap);
   const user = useAppSelector(state => state.user);;
 
@@ -103,7 +101,7 @@ const CatamaranSwap = ({
         ...error,
         sendAmount: 'Invalid number',
       });
-    } else if (balanceSBTC && BigInt(sendAmount * 1.e8) > balanceSBTC) {
+    } else if (balanceSBTC && Math.round(sendAmount * 1.e8) > balanceSBTC) {
       setError({
         ...error,
         sendAmount: 'You cannot send more than your balance.',
@@ -147,7 +145,8 @@ const CatamaranSwap = ({
     const amount = Number(value);
     setAmounts({ receiveAmount: amount, sendAmount: amount });
   };
-  const onPreviewSwap = () => {
+
+  const onPreviewSwap = async () => {
     if (Object.values(error).some(msg => !!msg)) {
       toast('Please fix the errors.', {
         type: 'error',

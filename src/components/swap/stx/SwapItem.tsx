@@ -1,8 +1,10 @@
 
-import sBtcImg from '/src/assets/img/sbtc.png';
+import { address } from "bitcoinjs-lib";
+import AnimatedImage from '../AnimatedImage';
 import BtcImg from '/src/assets/img/btc.png';
 import DownImg from '/src/assets/img/down.svg?react';
-import AnimatedImage from '../AnimatedImage';
+import sBtcImg from '/src/assets/img/sbtc.png';
+import { bytesToHex } from "@clarigen/core";
 
 const SwapItem = ({ sendAmount, receiveAmount, receiverSTXAddress, userBTCAddress, mode, stxStatus, btcStatus }: {
     sendAmount: number, receiveAmount: number; receiverSTXAddress: string; userBTCAddress: string;
@@ -50,7 +52,12 @@ const SwapItem = ({ sendAmount, receiveAmount, receiverSTXAddress, userBTCAddres
         </div>
         <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between sm:items-center text-sm leading-[17px] opacity-50 font-normal">
             <p>Your BTC address</p>
-            <p className="text-xs">{userBTCAddress}</p>
+            <div className="relative group">
+                <p className="text-xs">{userBTCAddress}</p>
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2">
+                    scriptPubKey: {bytesToHex(address.toOutputScript(userBTCAddress))}
+                </div>
+            </div>
         </div>
         <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between sm:items-center text-sm leading-[17px] opacity-50 font-normal">
             <p>Recipient's STX address</p>

@@ -1,22 +1,19 @@
 import React from 'react';
 
-import { address } from "bitcoinjs-lib";
-import { useDispatch } from 'react-redux';
-import { useAppSelector } from '../../../app/hooks';
+import validate, { getAddressInfo, Network } from 'bitcoin-address-validation';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { setSwapTransactions } from '../../../app/slices/Swap/thunks';
-import { AppDispatch } from '../../../app/store';
 import { SwapProgress } from '../../../lib/swap';
+import { sendBTCLeather } from '../../../lib/wallet-requests/sendBtc';
 import BtcSBtcSwapTitle from '../BtcSBtcSwapTitle';
 import BtcSwapItem from './BtcSwapItem';
 
-const BtcSwapConfirm = ({
-  setSwapProgress,
-  chain }: {
-    setSwapProgress: React.Dispatch<React.SetStateAction<SwapProgress>>;
-    chain: string;
-  }) => {
+const BtcSwapConfirm = ({ setSwapProgress, chain }: {
+  setSwapProgress: React.Dispatch<React.SetStateAction<SwapProgress>>;
+  chain: string;
+}) => {
 
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const swapInfo = useAppSelector(state => state.swap);
 
 
@@ -26,14 +23,25 @@ const BtcSwapConfirm = ({
   } = swapInfo;
 
   const onConfirmBtnClicked = async () => {
-    dispatch(setSwapTransactions({
-      ...swapInfo.swapTxs,
-      btcTransferTx: "1234"
-    }));
-    setSwapProgress(SwapProgress.SUBMIT_ON_STX);
-    return;
+    console.log("onConfirmBtnClicked", userBTCAddress, receiveAmount, chain);
+    const addressInfo = getAddressInfo(userBTCAddress);
+    console.log(addressInfo);
+    const valid = validate(userBTCAddress, chain as Network);
+    if (valid) {
 
-    const btcAddress = address.fromBech32(userBTCAddress);
+      const result = await sendBTCLeather({
+        amountInSats: Math.floor(receiveAmount * 1e8),
+        recipient: userBTCAddress,
+        network: chain as Network
+      })
+      console.log(result)
+      dispatch(setSwapTransactions({
+        ...swapInfo.swapTxs,
+        btcTransferTx: result
+      }));
+      setSwapProgress(SwapProgress.SUBMIT_ON_STX);
+    }
+    return;
 
   };
 

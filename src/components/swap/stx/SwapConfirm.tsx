@@ -1,17 +1,13 @@
 import React from 'react';
 
-import { openContractCall, request, showContractCall } from '@stacks/connect';
-import { AssetString, broadcastTransaction, bufferCV, ContractIdString, FungibleConditionCode, FungiblePostCondition, makeContractCall, makeUnsignedContractCall, PostConditionMode, PostConditionType, principalCV, serializeCV, someCV, uintCV, UnsignedContractCallOptions } from '@stacks/transactions';
+import { request } from '@stacks/connect';
+import { CallContractParams } from '@stacks/connect/dist/types/methods';
+import { AssetString, bufferCV, ContractIdString, Pc, principalCV, serializeCV, someCV, uintCV } from '@stacks/transactions';
 import { address } from "bitcoinjs-lib";
-import { useDispatch } from 'react-redux';
-import { useAppSelector } from '../../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { setSwapTransactions } from '../../../app/slices/Swap/thunks';
-import { AppDispatch } from '../../../app/store';
 import { SwapProgress } from '../../../lib/swap';
 import SwapItem from './SwapItem';
-import { userSession } from '../../../lib/userSession';
-import { makeFungiblePostCondition } from '@clarigen/core';
-import { CallContractParams } from '@stacks/connect/dist/types/methods';
 
 const SwapConfirm = ({
   setSwapProgress,
@@ -25,7 +21,7 @@ const SwapConfirm = ({
   chain: string;
 }) => {
 
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const swapInfo = useAppSelector(state => state.swap);
   const user = useAppSelector(state => state.user);
 
@@ -42,30 +38,25 @@ const SwapConfirm = ({
   };
 
   const onConfirmBtnClicked = async () => {
-    dispatch(setSwapTransactions({ submitTx: "1234" }));
-    setSwapProgress(SwapProgress.SWAP_COMPLETED);
-    return;
 
-    const btcAddress = address.fromBech32(userBTCAddress);
     const [contractAddress, contractName] = sbtcSwapContract.split('.');
+
+    console.log("userbtc outputscript", address.toOutputScript(userBTCAddress));
 
     const functionArgs = [
       uintCV(Math.floor(sendAmount * 1e8)),
-      bufferCV(btcAddress.data),
+      bufferCV(address.toOutputScript(userBTCAddress)),
       uintCV(Math.floor(receiveAmount * 1.e8)),
       someCV(principalCV(receiverSTXAddress)),
       uintCV(Math.floor(sendAmount * 10 / 100))];
 
-    const postConditions = [{
-      type: "ft-postcondition",
-      condition: "eq",
-      address: stxAddress!,
-      amount: Math.floor(sendAmount * 1e8),
-      asset: sbtcAsset
-    }
-    ];
+    const [assetContract, assetName] = sbtcAsset.split('::');
+    const postConditions = [Pc.origin().willSendEq(
+      Math.floor(sendAmount * 1e8),
+    ).ft(assetContract as `${string}.${string}`, assetName)];
 
-    // console.log(await request("supportedMethods"));  
+
+    //console.log(await request("supportedMethods"));
 
     // const contractCall = await makeUnsignedContractCall({
     //   contractAddress,
@@ -87,7 +78,7 @@ const SwapConfirm = ({
       {
         contract: sbtcSwapContract,
         functionName: "create-swap",
-        functionArgs,
+        functionArgs: functionArgs.map(serializeCV),
         postConditionMode: "allow",
         //postConditions,
         network: chain === "testnet" ? "testnet" : "mainnet",
@@ -96,10 +87,11 @@ const SwapConfirm = ({
 
     if (!response.txid) {
       console.log("signTransaction failed", response);
+      return
     }
 
     if (true || response.txid) {
-      dispatch(setSwapTransactions({ submitTx: response.txid }));
+      dispatch(setSwapTransactions({ createTx: response.txid }));
       setSwapProgress(SwapProgress.SWAP_COMPLETED);
     }
   };

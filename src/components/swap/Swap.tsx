@@ -19,7 +19,7 @@ const Swap = () => {
   const { id } = useParams<{ id: string }>();
   const user = useAppSelector(state => state.user);;
 
-  const swapProgressInitial = id ? SwapProgress.SUBMIT_BTC_CONFIRM : SwapProgress.PREVEIW_SWAP;
+  const swapProgressInitial = id ? SwapProgress.SUBMIT_ON_STX : SwapProgress.PREVEIW_SWAP;
   const [swapProgress, setSwapProgress] = useState<SwapProgress>(swapProgressInitial);
   const [selectedHeaderItem, setSelectedHeaderItem] = useState<SwapItems>(
     id ? SwapItems.HISTORY : SwapItems.CATAMARAN_SWAP
@@ -45,7 +45,7 @@ const Swap = () => {
   }, [wsUrl]);
 
   const sbtcAsset = isTestnet ? "SN1Z0WW5SMN4J99A1G1725PAB8H24CWNA7Z8H7214.sbtc-token::sbtc-token" : "SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token::sbtc-token"
-  const sbtcSwapContract = isTestnet ? "ST3FFRX7C911PZP5RHE148YDVDD9JWVS6FZRA60VS.btc-sbtc-swap" : "SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.undefined";
+  const sbtcSwapContract = isTestnet ? "ST3FFRX7C911PZP5RHE148YDVDD9JWVS6FZRA60VS.btc-sbtc-swap" : "SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.btc-sbtc-swap-v2";
 
   return (
     <div className="w-full flex justify-center">
@@ -90,7 +90,8 @@ const Swap = () => {
               case SwapProgress.SUBMIT_BTC_CONFIRM:
                 return <BtcSwapConfirm setSwapProgress={setSwapProgress} chain={chain} />
               case SwapProgress.SUBMIT_ON_STX:
-                return <BtcSwapClaim setSwapProgress={setSwapProgress} chain={chain} />
+                return <BtcSwapClaim setSwapProgress={setSwapProgress}
+                  sbtcSwapContract={sbtcSwapContract} chain={chain} client={client} />
               case SwapProgress.SUBMIT_ON_STX_COMPLETED:
                 return <BtcSwapComplete setSwapProgress={setSwapProgress} chain={chain} />
 

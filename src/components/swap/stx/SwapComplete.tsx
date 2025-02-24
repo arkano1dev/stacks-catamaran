@@ -23,7 +23,7 @@ const SwapComplete = ({
     addressInfo: { userBTCAddress, receiverSTXAddress },
     swapTxs,
   } = swapInfo;
-  const txId = swapTxs?.submitTx;
+  const txId = swapTxs?.createTx;
 
   const [swapId, setSwapId] = useState<string>();
   const [txError, setTxError] = useState<{ status: (Transaction | MempoolTransaction)["tx_status"] } | undefined>();
