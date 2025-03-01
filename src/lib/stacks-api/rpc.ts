@@ -1,4 +1,5 @@
-import { ClarityValue, serializeCV } from '@stacks/transactions';
+import { createClient } from '@stacks/blockchain-api-client';
+import { ClarityValue, serializeCV, uintCV } from '@stacks/transactions';
 
 export const wasSegwitTxMinedCompact = async (verifyArgs: ClarityValue[], stxAddress: string) => {
   return fetch(
@@ -30,4 +31,15 @@ export const concatWtx = async (claimArgs: ClarityValue[], stxAddress: string) =
       }),
     }
   ).then(res => res.json());
+};
+
+export const getSwapInfo = async (swapId: string, sbtcSwapContract: `${string}.${string}`) => {
+  const [contractAddress, contractName] = sbtcSwapContract.split('.');
+  return fetch(`https://api.hiro.so/v2/map_entry/${contractAddress}/${contractName}/swaps`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(serializeCV(uintCV(swapId))),
+  }).then(res => res.json());
 };

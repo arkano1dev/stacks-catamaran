@@ -17,6 +17,8 @@ export interface SwapTransactions {
   btcTransferTx?: string;
   submitTx?: string;
   cancelTx?: string;
+  swapId?: string;
+  done?: boolean;
 }
 
 export interface SwapDetail {
@@ -64,8 +66,8 @@ export const swapSlice = createSlice({
       .addCase(setSwapTransactions.fulfilled, (state, action) => {
         return {
           ...state,
-          addressInfo: {
-            ...state.addressInfo,
+          swapTxs: {
+            ...state.swapTxs,
             ...action.payload,
           },
         };

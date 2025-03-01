@@ -10,16 +10,22 @@ import { SwapItems, SwapProgress } from '../../lib/swap';
 import { useParams } from 'react-router-dom';
 import ConnectFirst from './ConnectFirst';
 import History from './History';
-import { useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import BtcSwapConfirm from './btc/BtcSwapConfirm';
 import BtcSwapClaim from './btc/BtcSwapClaim';
 import BtcSwapComplete from './btc/BtcSwapComplete';
+import { getSwapInfo } from '../../lib/stacks-api/rpc';
+import { setSwapAddressDetail, setSwapAmountDetail, setSwapTransactions } from '../../app/slices/Swap/thunks';
+import { BooleanCV, BufferCV, ClarityType, cvToString, hexToCV, PrincipalCV, SomeCV, TupleCV, UIntCV } from '@stacks/transactions';
 
 const Swap = () => {
+  const dispatch = useAppDispatch();
+
   const { id } = useParams<{ id: string }>();
   const user = useAppSelector(state => state.user);;
+  const swapInfo = useAppSelector(state => state.swap);
 
-  const swapProgressInitial = id ? SwapProgress.SUBMIT_ON_STX : SwapProgress.PREVEIW_SWAP;
+  const swapProgressInitial = id ? swapInfo.swapTxs?.done ? SwapProgress.SUBMIT_ON_STX_COMPLETED : SwapProgress.SUBMIT_ON_STX : SwapProgress.PREVEIW_SWAP;
   const [swapProgress, setSwapProgress] = useState<SwapProgress>(swapProgressInitial);
   const [selectedHeaderItem, setSelectedHeaderItem] = useState<SwapItems>(
     id ? SwapItems.HISTORY : SwapItems.CATAMARAN_SWAP
@@ -28,6 +34,9 @@ const Swap = () => {
   const apiUrl = params.get('api');
   const chain = params.get('chain') || "";
   const isTestnet = chain === 'testnet';
+
+  const sbtcAsset = isTestnet ? "SN1Z0WW5SMN4J99A1G1725PAB8H24CWNA7Z8H7214.sbtc-token::sbtc-token" : "SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token::sbtc-token"
+  const sbtcSwapContract = isTestnet ? "ST3FFRX7C911PZP5RHE148YDVDD9JWVS6FZRA60VS.btc-sbtc-swap" : "SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.btc-sbtc-swap-v2";
 
   const baseUrl = apiUrl ? apiUrl : isTestnet ? "https://api.testnet.hiro.so" : 'https://api.hiro.so';
   const wsUrl = isTestnet ? "wss://api.testnet.hiro.so" : 'wss://api.hiro.so';
@@ -44,9 +53,39 @@ const Swap = () => {
     fn();
   }, [wsUrl]);
 
-  const sbtcAsset = isTestnet ? "SN1Z0WW5SMN4J99A1G1725PAB8H24CWNA7Z8H7214.sbtc-token::sbtc-token" : "SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token::sbtc-token"
-  const sbtcSwapContract = isTestnet ? "ST3FFRX7C911PZP5RHE148YDVDD9JWVS6FZRA60VS.btc-sbtc-swap" : "SP2PABAF9FTAJYNFZH93XENAJ8FVY99RRM50D2JG9.btc-sbtc-swap-v2";
+  useEffect(() => {
+    if (id !== undefined) {
+      getSwapInfo(id, sbtcSwapContract).then((res) => {
+        const entryCV = hexToCV(res.data) as SomeCV<TupleCV<{
+          amount: UIntCV;
+          "btc-receiver": BufferCV;
+          done: BooleanCV;
+          premium: UIntCV;
+          sats: UIntCV;
+          "sbtc-sender": PrincipalCV;
+          "stx-receiver": SomeCV<BufferCV>;
+          when: UIntCV;
+        }>>;
 
+        console.log(cvToString(entryCV));
+        dispatch(setSwapAddressDetail({
+          ...swapInfo.addressInfo,
+        }))
+        dispatch(setSwapAmountDetail({
+          ...swapInfo.amountInfo,
+          sendAmount: Number(BigInt(entryCV.value.value.amount.value)) / 1e8,
+          receiveAmount: Number(BigInt(entryCV.value.value.sats.value)) / 1e8,
+        }))
+        dispatch(setSwapTransactions({
+          ...swapInfo.swapTxs,
+          swapId: id,
+          done: entryCV.value.value.done.type === ClarityType.BoolTrue
+        })).then(r => console.log(r))
+      });
+    }
+  }, [id])
+
+  console.log({ id, swapInfo })
   return (
     <div className="w-full flex justify-center">
       <div className="w-full max-w-[1440px] flex justify-center px-5 pb-8">

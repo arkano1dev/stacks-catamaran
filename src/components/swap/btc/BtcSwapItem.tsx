@@ -58,8 +58,13 @@ const BtcSwapItem = ({ sendAmount, receiveAmount, receiverSTXAddress, userBTCAdd
                 <p className="text-[28px] leading-6">sBTC</p>
             </div>
         </div>
+
         <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between sm:items-center text-sm leading-[17px] opacity-50 font-normal">
-            <p>Your STX address</p>
+            <p>BTC received at</p>
+            <p className="text-xs">{userBTCAddress}</p>
+        </div>
+        <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between sm:items-center text-sm leading-[17px] opacity-50 font-normal">
+            <p>sBTC received at</p>
             <p className="text-xs">{receiverSTXAddress}</p>
         </div>
 

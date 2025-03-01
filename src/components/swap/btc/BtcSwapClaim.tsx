@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Client, MempoolTransaction, StacksApiWebSocketClient, Transaction } from '@stacks/blockchain-api-client';
+import { Client, createClient, MempoolTransaction, StacksApiWebSocketClient, Transaction } from '@stacks/blockchain-api-client';
 import { cvToString, hexToCV } from '@stacks/transactions';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { SwapProgress } from '../../../lib/swap';
@@ -12,6 +12,7 @@ import { createSubmitStxTransactionArgs } from '../../../lib/bitcoin-tx-proof/cr
 import { createBtcExplorerLink } from '../../../lib/browser';
 import { concatWtx, wasSegwitTxMinedCompact } from '../../../lib/stacks-api/rpc';
 import BtcSwapItem from './BtcSwapItem';
+import { shortTxid } from '../../../lib/format';
 
 const BtcSwapClaim = ({
   setSwapProgress,
@@ -22,7 +23,7 @@ const BtcSwapClaim = ({
   setSwapProgress: React.Dispatch<React.SetStateAction<SwapProgress>>;
   sbtcSwapContract: `${string}.${string}`;
   chain: string;
-  client: Client<paths, `${string}/${string}`>;
+  client: ReturnType<typeof createClient>;
 }) => {
   const swapInfo = useAppSelector(state => state.swap);
   const dispatch = useAppDispatch();
@@ -113,7 +114,7 @@ const BtcSwapClaim = ({
         <div className="flex gap-4 items-center flex-col sm:flex-row">
           {btcTxid ?
             <><a href={createBtcExplorerLink(btcTxid, chain)} target="_blank" className="underline pt-2 sm:p-0">
-              {btcTxid}
+              {shortTxid(btcTxid)}
             </a>
               <button className="rounded-full py-2 px-5 dark:bg-white bg-special-black text-base font-medium leading-5 text-white dark:text-special-black">
                 Copy
