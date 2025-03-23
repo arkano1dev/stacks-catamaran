@@ -7,6 +7,7 @@ import SBtcImg from '/src/assets/img/sbtc.png';
 
 const Home = lazy(() => import('./components/home/Home'));
 const Swap = lazy(() => import('./components/swap/Swap'));
+const NotFound = lazy(() => import('./components/notFound/NotFound'));
 
 const Loading = () => {
   return (
@@ -41,8 +42,10 @@ function App() {
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/swaps/:id" element={<Swap />} />
             <Route path="/swaps" element={<Swap />} />
+            <Route path="/swaps/:id" element={<Swap />} />
+            <Route path="/recent" element={<Swap />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
         <ToastContainer />

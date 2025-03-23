@@ -8,7 +8,8 @@ import { SwapProgress } from '../../../lib/swap';
 import { paths } from '@stacks/blockchain-api-client/lib/generated/schema';
 import { request } from '@stacks/connect';
 import { setSwapTransactions } from '../../../app/slices/Swap/thunks';
-import { createSubmitStxTransactionArgs } from '../../../lib/bitcoin-tx-proof/createArgs';
+import * as bitcoinTxProof from '../../../lib/proof/bitcoin-tx-proof';
+import * as clarityBitcoinClient from '../../../lib/proof/clarity-bitcoin-client';
 import { createBtcExplorerLink } from '../../../lib/browser';
 import { concatWtx, wasSegwitTxMinedCompact } from '../../../lib/stacks-api/rpc';
 import BtcSwapItem from './BtcSwapItem';
@@ -33,9 +34,10 @@ const BtcSwapClaim = ({
     addressInfo: { userBTCAddress, receiverSTXAddress },
     swapTxs,
   } = swapInfo;
-  const btcTxid = swapTxs?.btcTransferTx || "64ff37f00fa30a1234a89dd88b549c5180029b8e7aa49b703bde2b469f9703fb";
+  const btcTxid = swapTxs?.btcTransferTx;
 
-  const swapId = 0 //swapTxs?.swapId;
+  // swap id is verified in Swaps
+  const swapId = parseInt(swapTxs?.swapId!);
 
   const [txError, setTxError] = useState<{ status: (Transaction | MempoolTransaction)["tx_status"] } | undefined>();
   const [txPending, setTxPending] = React.useState(true);
@@ -54,32 +56,18 @@ const BtcSwapClaim = ({
 
   const onClaimBtnClicked = async () => {
 
-    const { claimArgs, verifyArgs } = await createSubmitStxTransactionArgs(swapId, btcTxid, chain);
-    const functionName = "submit-swap-segwit";
+    const { claimArgs, verifyArgs, segwit } = await clarityBitcoinClient.createSubmitStxTransactionArgs(swapId, btcTxid, chain);
 
-    // SimulationBuilder.new()
-    //   .withSender(receiverSTXAddress)
-    //   .addContractCall({
-    //     contract_id: sbtcSwapContract,
-    //     function_name: 'set-enabled',
-    //     function_args: functionArgs,
-    //   })
-    //   .run()
-    //   .catch(console.error);
+    const resultMined = await wasSegwitTxMinedCompact(verifyArgs, receiverSTXAddress);
+    console.log(resultMined);
 
-    const resultMind = await wasSegwitTxMinedCompact(verifyArgs, receiverSTXAddress);
-
-    console.log(cvToString(hexToCV(resultMind.result)));
-
-    const resultConcat = await concatWtx(claimArgs, receiverSTXAddress);
-
-    console.log(cvToString(hexToCV(resultConcat.result)));
+    const functionName: string = segwit ? "submit-swap-segwit" : "submit-swap-legacy";
 
     const response = await request("stx_callContract", {
       contract: sbtcSwapContract,
       functionName,
       functionArgs: claimArgs,
-      postConditionMode: "allow",
+      postConditionMode: "deny",
       network: chain === "testnet" ? "testnet" : "mainnet",
 
     });
@@ -101,8 +89,6 @@ const BtcSwapClaim = ({
 
   return (
     <div className="w-full p-5 flex flex-col gap-6 bg-white dark:bg-[rgba(11,11,15,0.9)] rounded-[18px] items-center">
-
-
       <p className="w-full text-center text-[28px] leading-10">{title}</p>
       <BtcSwapItem
         mode="btcReceived"

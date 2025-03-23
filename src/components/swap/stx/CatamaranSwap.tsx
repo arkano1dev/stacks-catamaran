@@ -210,7 +210,7 @@ const CatamaranSwap = ({
       </div>
       <div className="p-5 flex justify-between items-center rounded-lg bg-[rgba(7,7,10,0.03)] dark:bg-[#14151A] border-[1px] border-[rgba(7,7,10,0.1)] dark:border-[rgba(255,255,255,0.1)]">
         <div className="w-full">
-          <p className="text-xs font-light leading-[14px] opacity-50">You will receive</p>
+          <p className="text-xs font-light leading-[14px] opacity-50">You receive</p>
           <p className="text-xs leading-[14px] font-light opacity-50"></p>
           <div className="mt-2 w-full flex justify-between items-center">
             <div className="flex flex-col">

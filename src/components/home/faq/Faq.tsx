@@ -5,8 +5,8 @@ const Faq = () => {
     <div className="w-full mt-[120px] mb-[184px]">
       <h1 className="text-[28px] leading-[33px] font-medium text-center">FAQ</h1>
       <div className="mt-10 w-full flex flex-col gap-3">
-        <FaqItem title="What can go wrong with catamaran swaps (BTC - sBTC)?">
-          Even with fast bitcoin blocks (flash blocks), Catamaran swaps can be verified on the
+        <FaqItem title="What can go wrong with Catamaran Swaps (BTC - sBTC)?">
+          Even with fast bitcoin blocks (flash blocks), Catamaran Swaps can be verified on the
           Stacks blockchain. However, bitcoin transactions with more than 8 inputs or 8 outputs
           can't be verified.
         </FaqItem>

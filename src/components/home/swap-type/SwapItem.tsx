@@ -14,7 +14,7 @@ const SwapItem = () => {
         <img src={StxImg} alt="" className="w-[52px] h-[52px]" />
       </div>
       <p className="text-base leading-6 text-center mt-[18px]">
-        Swap between BTC and STC chain using catamaran swaps
+        Swap between BTC and STC chain using Catamaran Swaps
       </p>
       <Link
         to="/swaps"

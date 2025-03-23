@@ -1,22 +1,25 @@
 import { useEffect, useState } from 'react';
 import CatamaranSwap from './stx/CatamaranSwap';
-import SwapButton from './SwapButton';
 import SwapComplete from './stx/SwapComplete';
 import SwapConfirm from './stx/SwapConfirm';
+import SwapButton from './SwapButton';
 
 import { connectWebSocketClient, createClient, StacksApiWebSocketClient } from '@stacks/blockchain-api-client';
 import { SwapItems, SwapProgress } from '../../lib/swap';
 
+import { BooleanCV, BufferCV, ClarityType, cvToString, hexToCV, OptionalCV, PrincipalCV, SomeCV, TupleCV, UIntCV } from '@stacks/transactions';
 import { useParams } from 'react-router-dom';
-import ConnectFirst from './ConnectFirst';
-import History from './History';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import BtcSwapConfirm from './btc/BtcSwapConfirm';
+import { setSwapAddressDetail, setSwapAmountDetail, setSwapTransactions } from '../../app/slices/Swap/thunks';
+import { getSwapInfo } from '../../lib/stacks-api/rpc';
+import { NoSwapFound } from '../common/NoSwapFound';
 import BtcSwapClaim from './btc/BtcSwapClaim';
 import BtcSwapComplete from './btc/BtcSwapComplete';
-import { getSwapInfo } from '../../lib/stacks-api/rpc';
-import { setSwapAddressDetail, setSwapAmountDetail, setSwapTransactions } from '../../app/slices/Swap/thunks';
-import { BooleanCV, BufferCV, ClarityType, cvToString, hexToCV, PrincipalCV, SomeCV, TupleCV, UIntCV } from '@stacks/transactions';
+import BtcSwapConfirm from './btc/BtcSwapConfirm';
+import ConnectFirst from './ConnectFirst';
+import History from './History';
+import { address } from 'bitcoinjs-lib';
+import { hexToBytes } from '@stacks/common';
 
 const Swap = () => {
   const dispatch = useAppDispatch();
@@ -25,7 +28,7 @@ const Swap = () => {
   const user = useAppSelector(state => state.user);;
   const swapInfo = useAppSelector(state => state.swap);
 
-  const swapProgressInitial = id ? swapInfo.swapTxs?.done ? SwapProgress.SUBMIT_ON_STX_COMPLETED : SwapProgress.SUBMIT_ON_STX : SwapProgress.PREVEIW_SWAP;
+  const swapProgressInitial = id ? SwapProgress.LOADING_DATA : SwapProgress.PREVEIW_SWAP;
   const [swapProgress, setSwapProgress] = useState<SwapProgress>(swapProgressInitial);
   const [selectedHeaderItem, setSelectedHeaderItem] = useState<SwapItems>(
     id ? SwapItems.HISTORY : SwapItems.CATAMARAN_SWAP
@@ -56,31 +59,38 @@ const Swap = () => {
   useEffect(() => {
     if (id !== undefined) {
       getSwapInfo(id, sbtcSwapContract).then((res) => {
-        const entryCV = hexToCV(res.data) as SomeCV<TupleCV<{
-          amount: UIntCV;
-          "btc-receiver": BufferCV;
-          done: BooleanCV;
-          premium: UIntCV;
-          sats: UIntCV;
-          "sbtc-sender": PrincipalCV;
-          "stx-receiver": SomeCV<BufferCV>;
-          when: UIntCV;
-        }>>;
+        const optionalEntryCV = res
+        if (optionalEntryCV.type === ClarityType.OptionalNone) {
+          setSwapProgress(SwapProgress.SWAP_NOT_FOUND);
+        } else {
+          const entryCV = optionalEntryCV.value;
+          const done = entryCV.value.done.type === ClarityType.BoolTrue;
+          const receiverSTXAddress = entryCV.value['stx-receiver'].type === ClarityType.OptionalNone ? "" : cvToString(entryCV.value['stx-receiver'].value);
+          const userBTCAddress = address.fromOutputScript(hexToBytes(entryCV.value['btc-receiver'].value));
 
-        console.log(cvToString(entryCV));
-        dispatch(setSwapAddressDetail({
-          ...swapInfo.addressInfo,
-        }))
-        dispatch(setSwapAmountDetail({
-          ...swapInfo.amountInfo,
-          sendAmount: Number(BigInt(entryCV.value.value.amount.value)) / 1e8,
-          receiveAmount: Number(BigInt(entryCV.value.value.sats.value)) / 1e8,
-        }))
-        dispatch(setSwapTransactions({
-          ...swapInfo.swapTxs,
-          swapId: id,
-          done: entryCV.value.value.done.type === ClarityType.BoolTrue
-        })).then(r => console.log(r))
+          console.log(cvToString(entryCV));
+          dispatch(setSwapAddressDetail({
+            ...swapInfo.addressInfo,
+            receiverSTXAddress,
+            userBTCAddress,
+          }))
+          dispatch(setSwapAmountDetail({
+            ...swapInfo.amountInfo,
+            sendAmount: Number(BigInt(entryCV.value.amount.value)) / 1e8,
+            receiveAmount: Number(BigInt(entryCV.value.sats.value)) / 1e8,
+          }))
+          dispatch(setSwapTransactions({
+            ...swapInfo.swapTxs,
+            swapId: id,
+            done,
+          }))
+          const btcTxExists = swapInfo.swapTxs.btcTransferTx;
+          const progressFromData = done ? SwapProgress.SUBMIT_ON_STX_COMPLETED :
+            btcTxExists ?
+              SwapProgress.SUBMIT_ON_STX : SwapProgress.SUBMIT_BTC_CONFIRM
+          console.log("swapInfo.swapTxs.btcTransferTx", swapInfo.swapTxs.btcTransferTx, progressFromData)
+          setSwapProgress(progressFromData);
+        }
       });
     }
   }, [id])
@@ -93,6 +103,10 @@ const Swap = () => {
 
           {(() => {
             switch (swapProgress) {
+              case SwapProgress.LOADING_DATA:
+                return <div className="w-full flex justify-center items-center h-[300px]">
+                  <p>Loading data...</p>
+                </div>
               case SwapProgress.PREVEIW_SWAP:
                 return <>
                   <div className="w-full flex rounded-[18px] bg-white dark:bg-[rgba(11,11,15,0.9)] p-2 gap-2.5 text-center">
@@ -125,6 +139,7 @@ const Swap = () => {
                   sbtcAsset={sbtcAsset} chain={chain} />;
               case SwapProgress.SWAP_COMPLETED:
                 return <SwapComplete setSwapProgress={setSwapProgress} wsClient={wsClient} chain={chain} />;
+
               // btc receiver actions
               case SwapProgress.SUBMIT_BTC_CONFIRM:
                 return <BtcSwapConfirm setSwapProgress={setSwapProgress} chain={chain} />
@@ -133,6 +148,15 @@ const Swap = () => {
                   sbtcSwapContract={sbtcSwapContract} chain={chain} client={client} />
               case SwapProgress.SUBMIT_ON_STX_COMPLETED:
                 return <BtcSwapComplete setSwapProgress={setSwapProgress} chain={chain} />
+              case SwapProgress.SWAP_NOT_FOUND:
+                return <NoSwapFound id={id || ""} />
+              default:
+                return <div className="w-full flex justify-center items-center">
+                  <p>Something went wrong</p>
+                  <div className="flex-1 flex justify-center my-10">
+                    <img src='/404.png' alt='404' />
+                  </div>
+                </div>
 
             }
           })()}

@@ -1,5 +1,6 @@
 import { hexToBytes, intToBytes } from '@stacks/common';
 import { bufferCV, ClarityValue, listCV, tupleCV, uintCV } from '@stacks/transactions';
+import { getWitnessData } from './witnessdata';
 
 export async function createSubmitStxTransactionArgs(
   swapId: number,
@@ -95,20 +96,7 @@ export async function createSubmitStxTransactionArgs(
       '16a4b990f0a11c0f457a3c7e9602f12e7d1c01c52bf8054a436d5c59bc52361e70557208a4dbf39a58f934a4281f8f02349b1da0562eb6a2f01ea91a4379b8741f18ead8d915bc629fc42ec82dd2eb7cb5f821a9bd02fbc95b31fc6c61c4c70f672df50e65d055c195431827e6c2d54fe481390b312867af1d5696b355ea2ac3c7a553c8c34e8a381a0ebf46ef29fc2b40771bdbdd4c433b32c291a78a4ab55083efc755b4956d75ede9ad978b58bf59c3bfdbba7db616f55e8e357277fe42c28f4e35963e37c388265a7e86d1f14df844200bbcd9f1e6aaa15e425e89571f57d273736af45bb83fdbd51005db17f271b9cac2e77f109be7beb3b0dbd7399673f258e7b1ad96b9178cd9178908812daddec1a4fc66c8ebc9c803958221c258878f43fd20444530e20bb86c284dd2aa258c49737dffdb8a4732665b4dc5b150411f8c9eeec8ca3b329381ba88bb9ab3bab0becd91a7e03affe4edc8f55c9d068f0b0201b08b99bc059601f2d579b5551c79e77c0c830867d688ba7d1797e4cf447797571548f8b4b7bd6a904bc366c55f0f5fb2f551e94262aa98671bc275b940',
   };
 
-  let hasWitnessData = false;
-  const witnessData: number[] = [];
-  for (let vin of txObject.vin) {
-    if (!vin.witness) {
-      continue;
-    }
-    hasWitnessData = true;
-    witnessData.push(vin.witness.length);
-    for (let item of vin.witness || []) {
-      const b = hexToBytes(item);
-      witnessData.push(b.length);
-      witnessData.push(...b);
-    }
-  }
+  const { witnessData, hasWitnessData } = getWitnessData(txObject);
 
   // split txProof.witnessMerkleProof in chunks of 64 characters
   const chunks = txProof.witnessMerkleProof.match(/.{1,64}/g);
@@ -163,7 +151,7 @@ export async function createSubmitStxTransactionArgs(
         ),
         locktime: bufferCV(intToBytes(txObject.locktime, 4).reverse()),
       }),
-      bufferCV(new Uint8Array(witnessData)),
+      bufferCV(witnessData),
       bufferCV(hexToBytes(headerHex)),
       uintCV(txProof.txIndex),
       uintCV(txProof.merkleProofDepth),

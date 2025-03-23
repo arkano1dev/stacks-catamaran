@@ -65,7 +65,7 @@ const SwapItem = ({ sendAmount, receiveAmount, receiverSTXAddress, userBTCAddres
         </div>
         <div className="h-[1px] bg-[rgba(255,255,255,0.1)]" />
         <p className="text-sm leading-5 font-extralight">
-            You will send {sendAmount} sBTC to the escrow contract. The swap can be cancelled after 100 blocks.
+            You will send {sendAmount} sBTC to the escrow contract. You can cancel the swap after 100 blocks.
         </p>
     </div>
 }

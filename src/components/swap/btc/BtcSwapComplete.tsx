@@ -80,7 +80,7 @@ const BtcSwapComplete = ({
   };
 
   const title = txPending ? "Claim Transaction Pending" :
-    txError ? "Claim Transaction failed" : `Catamaran Swap ${swapId}`;
+    txError ? "Claim Transaction failed" : `Catamaran Swap #${swapId}`;
 
   // @ts-ignore
   const swapIdActionLabel = navigator.share ? "Share Swap" : "Copy Swap";

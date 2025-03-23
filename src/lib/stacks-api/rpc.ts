@@ -1,5 +1,15 @@
-import { createClient } from '@stacks/blockchain-api-client';
-import { ClarityValue, serializeCV, uintCV } from '@stacks/transactions';
+import {
+  BooleanCV,
+  BufferCV,
+  ClarityValue,
+  hexToCV,
+  OptionalCV,
+  PrincipalCV,
+  serializeCV,
+  TupleCV,
+  UIntCV,
+  uintCV,
+} from '@stacks/transactions';
 
 export const wasSegwitTxMinedCompact = async (verifyArgs: ClarityValue[], stxAddress: string) => {
   return fetch(
@@ -41,5 +51,20 @@ export const getSwapInfo = async (swapId: string, sbtcSwapContract: `${string}.$
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(serializeCV(uintCV(swapId))),
-  }).then(res => res.json());
+  })
+    .then(res => res.json())
+    .then(res => {
+      const optionalEntryCV = hexToCV(res.data) as OptionalCV<
+        TupleCV<{
+          amount: UIntCV;
+          'btc-receiver': BufferCV;
+          done: BooleanCV;
+          premium: UIntCV;
+          sats: UIntCV;
+          'stx-receiver': OptionalCV<PrincipalCV>;
+          when: UIntCV;
+        }>
+      >;
+      return optionalEntryCV;
+    });
 };

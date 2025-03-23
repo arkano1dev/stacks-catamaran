@@ -10,7 +10,7 @@ const SwapType = () => {
           Swap your digital assets
         </h1>
         <p className="mt-4 text-sm leading-7 text-center font-light">
-          You can use Catamaran swaps in three ways.
+          You can use Catamaran Swaps in three ways.
         </p>
       </>
       <div className="mt-10 flex flex-col sm:flex-row sm:justify-between gap-[30px]">
