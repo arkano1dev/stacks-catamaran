@@ -60,20 +60,13 @@ const BtcSwapItem = ({ sendAmount, receiveAmount, receiverSTXAddress, userBTCAdd
         </div>
 
         <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between sm:items-center text-sm leading-[17px] opacity-50 font-normal">
-            <p>BTC received at</p>
+            <p>{mode === "completed" || btcStatus === "confirmed" ? "Received BTC at" : "Receiving BTC at"}</p>
             <p className="text-xs">{userBTCAddress}</p>
         </div>
         <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between sm:items-center text-sm leading-[17px] opacity-50 font-normal">
-            <p>sBTC received at</p>
+            <p>{mode === "completed" ? "Received sBTC at" : "Receiving sBTC at"}</p>
             <p className="text-xs">{receiverSTXAddress}</p>
         </div>
-
-        {mode === "confirm" &&
-            <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between sm:items-center text-sm leading-[17px] opacity-50 font-normal">
-                <p>Recipient's BTC address</p>
-                <p className="text-xs">{userBTCAddress}</p>
-            </div>
-        }
         <div className="h-[1px] bg-[rgba(255,255,255,0.1)]" />
         <p className={`text-sm leading-5 font-extralight ${stxStatus === "stxClaimPending" ? "animate-pulse" : ""}`}>
             {mode === "confirm" ? `You will send ${receiveAmount} BTC. Then, you can claim ${sendAmount} sBTC from escrow.` :

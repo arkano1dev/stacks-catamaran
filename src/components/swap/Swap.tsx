@@ -145,7 +145,8 @@ const Swap = () => {
                 return <BtcSwapConfirm setSwapProgress={setSwapProgress} chain={chain} />
               case SwapProgress.SUBMIT_ON_STX:
                 return <BtcSwapClaim setSwapProgress={setSwapProgress}
-                  sbtcSwapContract={sbtcSwapContract} chain={chain} client={client} />
+                  sbtcSwapContract={sbtcSwapContract}
+                  sbtcAsset={sbtcAsset} chain={chain} client={client} />
               case SwapProgress.SUBMIT_ON_STX_COMPLETED:
                 return <BtcSwapComplete setSwapProgress={setSwapProgress} chain={chain} />
               case SwapProgress.SWAP_NOT_FOUND:

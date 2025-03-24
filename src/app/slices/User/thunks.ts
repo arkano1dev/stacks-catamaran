@@ -6,5 +6,5 @@ export const userConnected = createAsyncThunk('connect', async (wallet: UserStat
 });
 
 export const userDisconnected = createAsyncThunk('connect', async () => {
-  return { isAuthenticated: false };
+  return { isAuthenticated: false, wallet: undefined };
 });

@@ -9,19 +9,17 @@ export async function createSubmitStxTransactionArgs(
   btcTxid: string,
   chain: string
 ): Promise<{ claimArgs: ClarityValue[]; verifyArgs: ClarityValue[]; segwit: boolean }> {
-  if (chain !== 'mainnet') {
+  if (chain && chain !== 'mainnet') {
     return Promise.reject('Only mainnet supported');
   }
 
   const response = await fetch(
     `https://api.bigmarket.ai/bigmarket-api/clarity-bitcoin/tx/${btcTxid}/proof`
-  ).then(res => res.json());
-
+  );
   if (!response.ok) {
     return Promise.reject('service failed');
   }
   const { proof, data } = await response.json();
-
   const txObject = await fetch(`https://mempool.space/api/tx/${btcTxid}`).then(res => res.json());
   const { witnessData, hasWitnessData } = getWitnessData(txObject);
 
@@ -61,8 +59,8 @@ export async function createSubmitStxTransactionArgs(
         bufferCV(hexToBytes(proof.header)),
         uintCV(proof.txIndex),
         uintCV(proof.treeDepth),
-        listCV(proof.wproofs.map((w: string) => bufferCV(hexToBytes(w)))),
-        bufferCV(hexToBytes(proof.merkleRoot)),
+        listCV(proof.wproof.map((w: string) => bufferCV(hexToBytes(w)))),
+        bufferCV(hexToBytes(proof.computedWtxidRoot)),
         bufferCV(hexToBytes(witnessReservedValue)),
         bufferCV(hexToBytes(proof.ctxHex)),
         listCV(proof.cproof.map((cb: string) => bufferCV(hexToBytes(cb)))),
@@ -74,10 +72,10 @@ export async function createSubmitStxTransactionArgs(
         uintCV(proof.txIndex),
         uintCV(proof.treeDepth),
         listCV(proof.wproof.map((w: string) => bufferCV(hexToBytes(w)))),
-        bufferCV(hexToBytes(proof.merkleRoot)),
+        bufferCV(hexToBytes(proof.computedWtxidRoot)),
         bufferCV(hexToBytes(witnessReservedValue)),
         bufferCV(hexToBytes(proof.ctxHex)),
-        listCV(proof.cproofs.map((cb: string) => bufferCV(hexToBytes(cb)))),
+        listCV(proof.cproof.map((cb: string) => bufferCV(hexToBytes(cb)))),
       ],
     };
   } else {
@@ -116,7 +114,7 @@ export async function createSubmitStxTransactionArgs(
         bufferCV(hexToBytes(proof.header)),
         uintCV(proof.txIndex),
         uintCV(proof.treeDepth),
-        listCV(proof.wproofs.map((w: string) => bufferCV(hexToBytes(w)))),
+        listCV(proof.wproof.map((w: string) => bufferCV(hexToBytes(w)))),
         bufferCV(hexToBytes(proof.merkleRoot)),
         bufferCV(hexToBytes(witnessReservedValue)),
         bufferCV(hexToBytes(proof.ctxHex)),
@@ -132,7 +130,7 @@ export async function createSubmitStxTransactionArgs(
         bufferCV(hexToBytes(proof.merkleRoot)),
         bufferCV(hexToBytes(witnessReservedValue)),
         bufferCV(hexToBytes(proof.ctxHex)),
-        listCV(proof.cproofs.map((cb: string) => bufferCV(hexToBytes(cb)))),
+        listCV(proof.cproof.map((cb: string) => bufferCV(hexToBytes(cb)))),
       ],
     };
   }

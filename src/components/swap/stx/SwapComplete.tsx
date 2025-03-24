@@ -7,6 +7,7 @@ import { useAppSelector } from '../../../app/hooks';
 import { SwapProgress } from '../../../lib/swap';
 import SwapItem from './SwapItem';
 import { createExplorerLink } from '../../../lib/browser';
+import { shortTxid } from '../../../lib/format';
 
 const SwapComplete = ({
   setSwapProgress,
@@ -36,7 +37,6 @@ const SwapComplete = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       setTxPending(false);
-      setSwapId("2")
     }, 3000);
     return () => clearTimeout(timer);
   }, []);
@@ -114,7 +114,7 @@ const SwapComplete = ({
         <div className="flex gap-4 items-center flex-col sm:flex-row">
           {txId ?
             <><a href={createExplorerLink(txId, chain)} target="_blank" className="underline pt-2 sm:p-0">
-              {txId}
+              {shortTxid(txId)}
             </a>
               <button className="rounded-full py-2 px-5 dark:bg-white bg-special-black text-base font-medium leading-5 text-white dark:text-special-black">
                 Copy
@@ -129,18 +129,26 @@ const SwapComplete = ({
           : <p className="opacity-50">Swap ID</p>}
         <div className="flex gap-4 items-center flex-col sm:flex-row">
           {txError ? <p>{txError.status}</p> :
-            <>
-              <a href={`/swaps/${swapId}`} target="_blank" className="underline pt-2 sm:p-0">
-                {swapId}
-              </a>
-              <button className={`rounded-full py-2 px-5 dark:bg-white bg-special-black text-base font-medium leading-5 ${swapId ? "text-white dark:text-special-black" : "text-slate-500 dark:text-slate-400"}`}
-                onClick={() => { if (swapId) { copySwapIdToClipboard(swapId) } }}>
-                Copy
-              </button>
-            </>
+            swapId ?
+              <>
+                <a href={`/swaps/${swapId}`} target="_blank" className="underline pt-2 sm:p-0">
+                  #{swapId}
+                </a>
+                <button className={`rounded-full py-2 px-5 dark:bg-white bg-special-black text-base font-medium leading-5 ${swapId ? "text-white dark:text-special-black" : "text-slate-500 dark:text-slate-400"}`}
+                  onClick={() => { if (swapId) { copySwapIdToClipboard(swapId) } }}
+                  disabled={txPending}>
+                  Copy
+                </button>
+              </>
+              : "Pending"
           }
         </div>
       </div>
+      {!txPending && !swapId && !txError &&
+        <div className="flex flex-col gap-3 w-full">
+          <p><em>Transaction submitted. Refresh the page, once transaction was confirmed.</em></p>
+        </div>
+      }
       <div className="flex flex-col gap-3 w-full">
         <button
           className={`text-center w-full rounded-full py-3  text-base font-medium leading-5 ${swapId ? "text-white dark:text-special-black" : "text-slate-500 dark:text-slate-400"}
