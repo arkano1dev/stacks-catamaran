@@ -1,3 +1,4 @@
+import { roundedUsdString } from '../../../lib/format';
 import BtcImg from '/src/assets/img/btc.png';
 import SBtcImg from '/src/assets/img/sbtc.png';
 
@@ -15,7 +16,7 @@ const SwapAssets = ({ btcPriceUsd }: { btcPriceUsd: number }) => {
             <p className="text-xs font-light leading-[14px] opacity-50">You send</p>
             <p className="mt-2 text-[28px] leading-6 font-light">1</p>
             <p className="mt-4 text-xs leading-[14px] font-light opacity-50">
-              ≈${btcPriceUsd.toLocaleString('en-US')}
+              ≈${roundedUsdString(btcPriceUsd)}
             </p>
           </div>
           <div className="flex gap-2 items-center">
@@ -28,7 +29,7 @@ const SwapAssets = ({ btcPriceUsd }: { btcPriceUsd: number }) => {
             <p className="text-xs font-light leading-[14px] opacity-50">You receive</p>
             <p className="mt-2 text-[28px] leading-6 font-light">1</p>
             <p className="mt-4 text-xs leading-[14px] font-light opacity-50">
-              ≈${btcPriceUsd.toLocaleString('en-US')}
+              ≈${roundedUsdString(btcPriceUsd)}
             </p>
           </div>
           <div className="flex gap-2 items-center">
@@ -38,7 +39,7 @@ const SwapAssets = ({ btcPriceUsd }: { btcPriceUsd: number }) => {
         </div>
         <p className="px-10 py-2 text-sm leading-5 font-light">
           1 BTC = 1 sBTC
-          <span className="opacity-50"> (${btcPriceUsd.toLocaleString('en-US')})</span>
+          <span className="opacity-50"> (${roundedUsdString(btcPriceUsd)})</span>
         </p>
       </div>
     </div>

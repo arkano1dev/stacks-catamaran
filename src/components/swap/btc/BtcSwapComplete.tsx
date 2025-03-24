@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
 import { MempoolTransaction, StacksApiWebSocketClient, Transaction } from '@stacks/blockchain-api-client';
-import { hexToCV, ResponseOkCV, UIntCV } from '@stacks/transactions';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../../app/hooks';
 import { SwapProgress } from '../../../lib/swap';
 
-import { createBtcExplorerLink, createExplorerLink } from '../../../lib/browser';
 import BtcSwapItem from './BtcSwapItem';
 
 const BtcSwapComplete = ({

@@ -63,8 +63,8 @@ const SwapComplete = ({
     }
   }, [wsClient, txId]);
 
-  const copySwapIdToClipboard = (id: string) => {
-    navigator.clipboard.writeText(`Use swap ID ${id} to complete the swap: ${window.location.host}/swaps/${id}`)
+  const copySwapIdToClipboard = (id: string, completed: boolean = false) => {
+    navigator.clipboard.writeText(`Use swap ID ${id} to ${completed ? "view" : "complete"} the swap: ${window.location.host}/swaps/${id}`)
       .then(() => {
         console.log('Swap ID copied to clipboard');
       })

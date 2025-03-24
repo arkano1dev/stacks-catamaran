@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
-import { Client, createClient, MempoolTransaction, StacksApiWebSocketClient, Transaction } from '@stacks/blockchain-api-client';
-import { cvToString, hexToCV } from '@stacks/transactions';
+import { createClient, MempoolTransaction, StacksApiWebSocketClient, Transaction } from '@stacks/blockchain-api-client';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { SwapProgress } from '../../../lib/swap';
 
-import { paths } from '@stacks/blockchain-api-client/lib/generated/schema';
 import { request } from '@stacks/connect';
 import { setSwapTransactions } from '../../../app/slices/Swap/thunks';
-import * as bitcoinTxProof from '../../../lib/proof/bitcoin-tx-proof';
-import * as clarityBitcoinClient from '../../../lib/proof/clarity-bitcoin-client';
 import { createBtcExplorerLink } from '../../../lib/browser';
-import { concatWtx, wasSegwitTxMinedCompact } from '../../../lib/stacks-api/rpc';
-import BtcSwapItem from './BtcSwapItem';
 import { shortTxid } from '../../../lib/format';
+import * as clarityBitcoinClient from '../../../lib/proof/clarity-bitcoin-client';
+import { wasSegwitTxMinedCompact } from '../../../lib/stacks-api/rpc';
+import BtcSwapItem from './BtcSwapItem';
 
 const BtcSwapClaim = ({
   setSwapProgress,

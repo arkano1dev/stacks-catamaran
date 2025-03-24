@@ -10,6 +10,8 @@ import BtcImg from '/src/assets/img/btc.png';
 import ChevronDownImg from '/src/assets/img/chevron-down.svg?react';
 import InfoImg from '/src/assets/img/info.svg?react';
 import SBtcImg from '/src/assets/img/sbtc.png';
+import { roundedUsdString } from '../../../lib/format';
+import { btcPriceUsd } from '../../../lib/prices';
 
 interface AccountBalance {
   balanceSTX: number;
@@ -32,7 +34,6 @@ const CatamaranSwap = ({
   client,
   sbtcAsset,
   setSwapProgress,
-  chain
 }: {
   client: ReturnType<typeof createClient>;
   sbtcAsset: string;
@@ -54,7 +55,7 @@ const CatamaranSwap = ({
   const [stxAddress, setStxAddress] = useState<string>('');
   const [usdCurrencies, setUSDCurrencies] = useState({
     stx: 0,
-    btc: 97755.23, // TODO fetch price
+    btc: btcPriceUsd,
   });
   const { sendAmount, receiveAmount } = amounts;
   const dispatch = useAppDispatch();
@@ -72,7 +73,6 @@ const CatamaranSwap = ({
   }, [userBTCAddress]);
 
   useEffect(() => {
-    console.log(user.isAuthenticated, user.wallet?.stxAddress)
     if (user.isAuthenticated && user.wallet?.stxAddress) {
       const userSTXAddress = user.wallet.stxAddress;
       void (async () => {
@@ -105,6 +105,11 @@ const CatamaranSwap = ({
       setError({
         ...error,
         sendAmount: 'You cannot send more than your balance.',
+      });
+    } else if (balanceSBTC && sendAmount > 0.0001) {
+      setError({
+        ...error,
+        sendAmount: 'For beta phase, amounts are limited to 0.0001 sBTC',
       });
     } else if (error.sendAmount) {
       setError({
@@ -146,20 +151,21 @@ const CatamaranSwap = ({
     setAmounts({ receiveAmount: amount, sendAmount: amount });
   };
 
-  const onPreviewSwap = async () => {
+  const onPreviewSwap = () => {
     if (Object.values(error).some(msg => !!msg)) {
       toast('Please fix the errors.', {
         type: 'error',
       });
       return;
     }
-    dispatch(setSwapAmountDetail(amounts));
+    console.log(btcAddress, stxAddress);
     dispatch(
       setSwapAddressDetail({
         userBTCAddress: btcAddress,
         receiverSTXAddress: stxAddress,
       })
     );
+    dispatch(setSwapAmountDetail(amounts));
     setSwapProgress(SwapProgress.SWAP_CONFIRM);
   };
   return (
@@ -190,13 +196,13 @@ const CatamaranSwap = ({
             </div>
           </div>
           <p className="mt-4 text-xs leading-[14px] font-light opacity-50 text-right">
-            ≈${sendAmount * usdCurrencies.btc}
+            ≈{roundedUsdString(sendAmount * usdCurrencies.btc)}
           </p>
 
           <p className="pt-5 text-xs font-light leading-[14px] opacity-50">To</p>
           <div className="mt-2.5 mb-1 rounded-lg w-full flex flex-col sm:flex-row sm:gap-2 p-4 pl-3 border-[1px] border-[rgba(7,7,10,0.1)] dark:border-[rgba(255,255,255,0.1)] bg-[rgba(7,7,10,0.04)] text-sm leading-[17px] font-normal">
             <div className="flex gap-1.5 items-center opacity-50">
-              <p>Receiver STX address or name</p>
+              <p>Receiver STX address</p>
               <InfoImg className="w-3 h-3 dark:stroke-white stroke-special-black" />
             </div>
             <input
@@ -228,7 +234,7 @@ const CatamaranSwap = ({
             </div>
           </div>
           <p className="mt-4 text-xs leading-[14px] font-light opacity-50 text-right">
-            ≈${receiveAmount * usdCurrencies.btc}
+            ≈{roundedUsdString(receiveAmount * usdCurrencies.btc)}
           </p>
           <p className="pt-5 text-xs font-light leading-[14px] opacity-50">At</p>
           <div className="mt-2.5 mb-1 rounded-lg w-full flex flex-col sm:flex-row sm:gap-2 p-4 pl-3 border-[1px] border-[rgba(7,7,10,0.1)] dark:border-[rgba(255,255,255,0.1)] bg-[rgba(7,7,10,0.04)] text-sm leading-[17px] font-normal">
@@ -251,7 +257,6 @@ const CatamaranSwap = ({
           1 BTC = 1 sBTC
           <span className="opacity-50"> (${usdCurrencies.btc.toLocaleString()}) </span>
         </p>
-        <ChevronDownImg className="dark:fill-white fill-special-black flex-none" />
       </div>
       <button
         className="mt-5 rounded-full w-full py-3 dark:bg-white bg-special-black text-base font-medium leading-5 text-white dark:text-special-black"

@@ -51,22 +51,13 @@ const SwapItem = ({ sendAmount, receiveAmount, receiverSTXAddress, userBTCAddres
             </div>
         </div>
         <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between sm:items-center text-sm leading-[17px] opacity-50 font-normal">
-            <p>Your BTC address</p>
-            <div className="relative group">
-                <p className="text-xs">{userBTCAddress}</p>
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2">
-                    scriptPubKey: {bytesToHex(address.toOutputScript(userBTCAddress))}
-                </div>
-            </div>
-        </div>
-        <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between sm:items-center text-sm leading-[17px] opacity-50 font-normal">
-            <p>Recipient's STX address</p>
+            <p>Sending sBTC to</p>
             <p className="text-xs">{receiverSTXAddress}</p>
         </div>
-        <div className="h-[1px] bg-[rgba(255,255,255,0.1)]" />
-        <p className="text-sm leading-5 font-extralight">
-            You will send {sendAmount} sBTC to the escrow contract. You can cancel the swap after 100 blocks.
-        </p>
+        <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between sm:items-center text-sm leading-[17px] opacity-50 font-normal">
+            <p>Receiving BTC at</p>
+            <p className="text-xs text-end">{userBTCAddress} <br /><em>scriptPubKey:</em> {bytesToHex(address.toOutputScript(userBTCAddress))}</p>
+        </div>
     </div>
 }
 

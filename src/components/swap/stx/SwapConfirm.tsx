@@ -33,6 +33,7 @@ const SwapConfirm = ({
     addressInfo: { userBTCAddress, receiverSTXAddress },
   } = swapInfo;
 
+  console.log("swapInfo", swapInfo);
   const onGoBackBtnClicked = () => {
     setSwapProgress(SwapProgress.PREVEIW_SWAP);
   };
