@@ -47,24 +47,34 @@ const BtcSwapClaim = ({
   // swap id is verified in Swaps
   const swapId = parseInt(swapTxs?.swapId!);
 
-  const [txError, setTxError] = useState<{ status: (Transaction | MempoolTransaction)["tx_status"] } | undefined>();
+  const [btcTxError, setBtcTxError] = useState<{ status: "pending" | "notfound" | "confirmed" } | undefined>();
   const [txPending, setTxPending] = useState(true);
   const [claimingState, setClaimingState] = useState<ClaimingState>(ClaimingState.IDLE);
   const [verificationError, setVerificationError] = useState<string | undefined>();
+  const [showTxIdInput, setShowTxIdInput] = useState(false);
+  const [userBtcTxId, setUserBtcTxId] = useState<string | undefined>(btcTxId);
 
   useEffect(() => {
     const fn = async () => {
+      setTxPending(true);
+      setBtcTxError(undefined);
       console.log("checking", btcTxId)
       if (btcTxId) {
-        const tx = await fetchBtcTx(btcTxId);
-        console.log("tx status", tx.status)
-        if (tx.status.confirmed) {
+        try {
+          const tx = await fetchBtcTx(btcTxId)
+          console.log("tx status", tx.status)
+          if (tx.status.confirmed) {
+            setTxPending(false);
+          }
+        } catch (e) {
+          console.log("tx error", e);
           setTxPending(false);
+          setBtcTxError({ status: "notfound" });
         }
       }
     }
     fn();
-  }, []);
+  }, [btcTxId]);
 
 
   const onClaimBtnClicked = async () => {
@@ -102,8 +112,6 @@ const BtcSwapClaim = ({
       ],
       network: chain === "testnet" ? "testnet" : "mainnet",
     }).catch(() => { setClaimingState(ClaimingState.IDLE); });
-    console.log(response);
-    // check if response is type void
     if (response) {
       const submitTx = response.txid;
       if (submitTx) {
@@ -112,16 +120,16 @@ const BtcSwapClaim = ({
           submitTx
         }
         ));
+        setSwapProgress(SwapProgress.SUBMIT_ON_STX_COMPLETED);
       }
     }
     setClaimingState(ClaimingState.IDLE);
 
-    setSwapProgress(SwapProgress.SUBMIT_ON_STX_COMPLETED);
   };
 
 
   const title = txPending ? "Bitcoin Transaction Pending" :
-    txError ? "Bitcoin Transaction failed" : "Bitcoin Transaction Confirmed";
+    btcTxError ? "Bitcoin Transaction failed" : "Bitcoin Transaction Confirmed";
 
   return (
     <div className="w-full p-5 flex flex-col gap-6 bg-white dark:bg-[rgba(11,11,15,0.9)] rounded-[18px] items-center">
@@ -134,18 +142,57 @@ const BtcSwapClaim = ({
       <div className="text-sm w-full leading-[14px] p-5 border-[1px] border-[rgba(7,7,10,0.1)] dark:border-[rgba(255,255,255,0.1)] rounded-lg flex flex-col sm:flex-row justify-between items-center">
         <p className="opacity-50">Transaction ID</p>
         <div className="flex gap-4 items-center flex-col sm:flex-row">
-          {btcTxId ?
-            <><a href={createBtcExplorerLink(btcTxId, chain)} target="_blank" className="underline pt-2 sm:p-0">
-              {shortTxid(btcTxId)}
-            </a>
-              <button className="rounded-full py-2 px-5 dark:bg-white bg-special-black text-base font-medium leading-5 text-white dark:text-special-black">
-                Copy
-              </button>
-            </>
-            : <></>}
+          {
+
+            showTxIdInput ?
+              <>
+                <div className="mt-2.5 mb-1 rounded-lg w-full flex flex-col sm:flex-row sm:gap-2 p-4 pl-3 border-[1px] border-[rgba(7,7,10,0.1)] dark:border-[rgba(255,255,255,0.1)] bg-[rgba(7,7,10,0.04)] text-sm leading-[17px] font-normal">
+                  <input
+                    className="w-full outline-none bg-transparent grow"
+                    name="btcAddress"
+                    placeholder="Enter the transaction ID for the swap"
+                    value={userBtcTxId}
+                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setUserBtcTxId(ev.target.value)}
+                  />
+                </div>
+              </>
+              :
+              <>
+                {btcTxId &&
+                  <>
+                    <a href={createBtcExplorerLink(btcTxId, chain)} target="_blank" className="underline pt-2 sm:p-0">
+                      {shortTxid(btcTxId)}
+                    </a>
+                    <button className="rounded-full py-2 px-5 dark:bg-white bg-special-black text-base font-medium leading-5 text-white dark:text-special-black">
+                      Copy
+                    </button>
+                  </>
+                }
+              </>
+          }
+          {showTxIdInput ?
+            <button className="rounded-full py-2 px-5 dark:bg-white bg-special-black text-base font-medium leading-5 text-white dark:text-special-black"
+              onClick={() => {
+                console.log(userBtcTxId)
+                dispatch(setSwapTransactions({
+                  ...swapTxs,
+                  btcTransferTx: userBtcTxId
+                }));
+                setShowTxIdInput(!showTxIdInput);
+              }}>
+              Ok
+            </button> :
+            <button className="rounded-full py-2 px-5 dark:bg-white bg-special-black text-base font-medium leading-5 text-white dark:text-special-black"
+              onClick={() => {
+                setShowTxIdInput(!showTxIdInput);
+              }}>
+              Edit
+            </button>
+          }
         </div>
       </div>
-      {txPending && !btcTxId &&
+      {
+        txPending && !btcTxId &&
         <div className="flex flex-col gap-3 w-full">
           <p><em>Bitcoin transaction submitted. Refresh the page, once transaction was confirmed.</em></p>
         </div>
@@ -159,17 +206,18 @@ const BtcSwapClaim = ({
         {claimingState === ClaimingState.GETTING_DATA && <p>Getting data...</p>}
         {claimingState === ClaimingState.VERIFYING_TX && <p>Verifying transaction...</p>}
         {claimingState === ClaimingState.SUBMITTING && <p>Submitting transaction...</p>}
+        {btcTxError?.status === "notfound" && <p>Bitcoin Transaction not found on mempool.space</p>}
         <button
           className={`text-center w-full rounded-full py-3  text-base font-medium leading-5 ${!txPending ? "text-white dark:text-special-black" : "text-slate-500 dark:text-slate-400"}
            ${txPending ? "bg-gradient-to-r from-50% from-black dark:from-white to-50% to-white dark:to-black animate-gradientMove" : "bg-special-black dark:bg-white"}`}
           onClick={onClaimBtnClicked}
-          disabled={claimingState !== ClaimingState.IDLE || txPending || txError !== undefined}
+          disabled={claimingState !== ClaimingState.IDLE || txPending || btcTxError !== undefined}
         >
           Claim sBTC
         </button>
 
       </div>
-    </div>
+    </div >
   );
 };
 

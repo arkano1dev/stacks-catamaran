@@ -3,7 +3,7 @@ export const createExplorerLink = (txId: string, chain: string) => {
 };
 
 export const createBtcExplorerLink = (txId: string, chain: string) => {
-  return chain === 'mainnet'
-    ? `https://mempool.space/tx/${txId}`
-    : `https://mempool.space/testnet4/tx/${txId}`;
+  return chain === 'testnet'
+    ? `https://mempool.space/testnet4/tx/${txId}`
+    : `https://mempool.space/tx/${txId}`;
 };
