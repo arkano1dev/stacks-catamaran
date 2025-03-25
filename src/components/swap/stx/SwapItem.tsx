@@ -56,7 +56,7 @@ const SwapItem = ({ sendAmount, receiveAmount, receiverSTXAddress, userBTCAddres
         </div>
         <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between sm:items-center text-sm leading-[17px] opacity-50 font-normal">
             <p>Receiving BTC at</p>
-            <p className="text-xs text-end">{userBTCAddress} <br />{(mode === "confirm") && <><em>scriptPubKey:</em> {bytesToHex(address.toOutputScript(userBTCAddress))}</>}</p>
+            <p className="text-xs text-end">{userBTCAddress} <br />{(mode === "confirm" && userBTCAddress) && <><em>scriptPubKey:</em> {bytesToHex(address.toOutputScript(userBTCAddress))}</>}</p>
         </div>
     </div>
 }

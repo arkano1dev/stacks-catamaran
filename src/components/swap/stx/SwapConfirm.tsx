@@ -40,8 +40,6 @@ const SwapConfirm = ({
 
   const onConfirmBtnClicked = async () => {
 
-    const [contractAddress, contractName] = sbtcSwapContract.split('.');
-
     console.log("userbtc outputscript", address.toOutputScript(userBTCAddress));
 
     const functionArgs = [
@@ -57,31 +55,13 @@ const SwapConfirm = ({
     ).ft(assetContract as `${string}.${string}`, assetName)];
 
 
-    //console.log(await request("supportedMethods"));
-
-    // const contractCall = await makeUnsignedContractCall({
-    //   contractAddress,
-    //   contractName,
-    //   functionName: "create-swap",
-    //   functionArgs,
-    //   postConditionMode: PostConditionMode.Deny,
-    //   postConditions,
-    //   network: chain === "testnet" ? "testnet" : "mainnet",
-    //   publicKey: publicKey!
-    // } as UnsignedContractCallOptions)
-
-    // const response = await request("stx_signTransaction", {
-    //   transaction: contractCall.serialize(),
-    //   stxAddress: stxAddress,
-    // })
-
     const response = await request("stx_callContract",
       {
         contract: sbtcSwapContract,
         functionName: "create-swap",
         functionArgs: functionArgs.map(serializeCV),
-        postConditionMode: "allow",
-        //postConditions,
+        postConditionMode: "deny",
+        postConditions,
         network: chain === "testnet" ? "testnet" : "mainnet",
       } as CallContractParams
     )
@@ -91,7 +71,7 @@ const SwapConfirm = ({
       return
     }
 
-    if (true || response.txid) {
+    if (response.txid) {
       dispatch(setSwapTransactions({ createTx: response.txid }));
       setSwapProgress(SwapProgress.SWAP_COMPLETED);
     }
